@@ -270,7 +270,9 @@ export default function App() {
         ) : (
           <div className="print-reset origin-top" style={{ zoom }}>
             {!noPrintButton.has(tab) && <PrintButton />}
-            <Page />
+            <div data-capture>
+              <Page />
+            </div>
           </div>
         )}
       </main>
