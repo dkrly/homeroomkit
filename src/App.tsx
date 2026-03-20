@@ -13,20 +13,32 @@ import TimetableSchedule from './components/TimetableSchedule'
 import PrintButton from './components/PrintButton'
 import { useLogout } from './components/PasswordGate'
 
-const tabs = [
-  { id: 'students', label: '학생', icon: '👥' },
-  { id: 'timetable', label: '1학년2반', icon: '📋' },
-  { id: 'teacher', label: '정보', icon: '🧑‍🏫' },
-  { id: 'schedule', label: '일과운영표', icon: '⏰' },
-  { id: 'role', label: '1인1역', icon: '🎲' },
-  { id: 'role1', label: '우리반 역할', icon: '📋' },
-  { id: 'seating', label: '자리배치', icon: '💺' },
-  { id: 'seating1', label: '우리반 자리', icon: '🪑' },
-  { id: 'bingo', label: '친구탐험', icon: '🔍' },
-  { id: 'combo', label: '시간+일과', icon: '🖨️' },
-] as const
+type TabId = 'students' | 'timetable' | 'teacher' | 'schedule' | 'combo' | 'role' | 'role1' | 'seating' | 'seating1' | 'bingo' | 'settings'
 
-type TabId = (typeof tabs)[number]['id'] | 'settings'
+interface NavGroup {
+  icon: string
+  label: string
+  items: { id: TabId; label: string }[]
+}
+
+const navGroups: NavGroup[] = [
+  { icon: '👥', label: '학생', items: [{ id: 'students', label: '학생' }] },
+  { icon: '📋', label: '시간표', items: [
+    { id: 'timetable', label: '1학년2반' },
+    { id: 'teacher', label: '정보' },
+    { id: 'schedule', label: '일과운영표' },
+    { id: 'combo', label: '시간+일과' },
+  ]},
+  { icon: '🎲', label: '역할', items: [
+    { id: 'role', label: '1인1역' },
+    { id: 'role1', label: '우리반 역할' },
+  ]},
+  { icon: '💺', label: '자리', items: [
+    { id: 'seating', label: '자리배치' },
+    { id: 'seating1', label: '우리반 자리' },
+  ]},
+  { icon: '🔍', label: '친구탐험', items: [{ id: 'bingo', label: '친구탐험' }] },
+]
 
 const pages: Record<TabId, React.FC> = {
   students: StudentList,
@@ -59,11 +71,30 @@ const pageStyle = (tab: TabId) =>
     ? '@page { size: 594mm 420mm; margin: 0; }'
     : '@page { size: A4 portrait; margin: 0; }'
 
+function groupIndexOf(tab: TabId): number {
+  return navGroups.findIndex(g => g.items.some(i => i.id === tab))
+}
+
 export default function App() {
   const logout = useLogout()
   const [tab, setTab] = useState<TabId>('timetable')
+  const [openGroup, setOpenGroup] = useState<number>(groupIndexOf('timetable'))
   const [zoom, setZoom] = useState(loadZoom)
   const Page = pages[tab]
+
+  const handleGroupClick = (gi: number, group: NavGroup) => {
+    if (group.items.length === 1) {
+      setTab(group.items[0].id)
+      setOpenGroup(gi)
+    } else {
+      setOpenGroup(openGroup === gi ? -1 : gi)
+    }
+  }
+
+  const handleTabClick = (id: TabId, gi: number) => {
+    setTab(id)
+    setOpenGroup(gi)
+  }
 
   const changeZoom = (delta: number) => {
     setZoom(prev => {
@@ -77,13 +108,64 @@ export default function App() {
     <>
     <style>{pageStyle(tab)}</style>
     <div className="print-reset flex h-screen">
-      <nav className="w-20 bg-ink flex flex-col items-center py-6 shrink-0 print:hidden">
-        <div className="flex flex-col gap-2">
-          {tabs.map(t => <NavBtn key={t.id} active={tab === t.id} icon={t.icon} label={t.label} onClick={() => setTab(t.id)} />)}
+      <nav className="w-20 bg-ink flex flex-col items-center py-4 shrink-0 print:hidden overflow-y-auto">
+        <div className="flex flex-col gap-1 w-full px-1.5">
+          {navGroups.map((group, gi) => {
+            const isOpen = openGroup === gi
+            const isActiveGroup = group.items.some(i => i.id === tab)
+            const isSingle = group.items.length === 1
+
+            return (
+              <div key={gi}>
+                <button
+                  onClick={() => handleGroupClick(gi, group)}
+                  className={`w-full h-12 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer border-none
+                    ${isSingle && isActiveGroup
+                      ? 'bg-bg text-ink'
+                      : isActiveGroup
+                        ? 'bg-bg/20 text-bg'
+                        : 'bg-transparent text-bg/60 hover:bg-bg/10 hover:text-bg'
+                    }`}
+                >
+                  <span className="text-base">{group.icon}</span>
+                  <span className="text-[9px] leading-tight font-semibold flex items-center gap-0.5">
+                    {group.label}
+                    {!isSingle && <span className="text-[8px] opacity-60">{isOpen ? '▴' : '▾'}</span>}
+                  </span>
+                </button>
+
+                {!isSingle && isOpen && (
+                  <div className="flex flex-col gap-0.5 mt-0.5 mb-1">
+                    {group.items.map(item => (
+                      <button
+                        key={item.id}
+                        onClick={() => handleTabClick(item.id, gi)}
+                        className={`w-full h-8 rounded-lg text-[9px] font-semibold transition-all cursor-pointer border-none
+                          ${tab === item.id
+                            ? 'bg-bg text-ink'
+                            : 'bg-bg/10 text-bg/60 hover:bg-bg/15 hover:text-bg'
+                          }`}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </div>
-        <div className="mt-auto flex flex-col items-center gap-2">
-          <NavBtn active={tab === 'settings'} icon="⚙️" label="설정" onClick={() => setTab('settings')} />
-          <div className="flex items-center gap-1 mt-2">
+
+        <div className="mt-auto flex flex-col items-center gap-2 pt-2">
+          <button
+            onClick={() => { setTab('settings'); setOpenGroup(-1) }}
+            className={`w-16 h-12 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer border-none
+              ${tab === 'settings' ? 'bg-bg text-ink' : 'bg-transparent text-bg/60 hover:bg-bg/10 hover:text-bg'}`}
+          >
+            <span className="text-base">⚙️</span>
+            <span className="text-[9px] leading-tight font-semibold">설정</span>
+          </button>
+          <div className="flex items-center gap-1">
             <button onClick={() => changeZoom(-ZOOM_STEP)}
               className="w-7 h-7 rounded-lg bg-bg/10 text-bg/60 hover:bg-bg/20 hover:text-bg border-none cursor-pointer text-sm font-bold">
               -
@@ -95,10 +177,10 @@ export default function App() {
             </button>
           </div>
           <button onClick={logout}
-            className="w-14 h-8 rounded-lg bg-bg/10 text-bg/50 hover:bg-bg/20 hover:text-bg border-none cursor-pointer text-[10px] font-semibold">
+            className="w-14 h-7 rounded-lg bg-bg/10 text-bg/50 hover:bg-bg/20 hover:text-bg border-none cursor-pointer text-[9px] font-semibold">
             로그아웃
           </button>
-          <span className="text-[8px] text-bg/30 leading-tight text-center break-all px-1">{__BUILD_VERSION__}</span>
+          <span className="text-[7px] text-bg/30 leading-tight text-center break-all px-1">{__BUILD_VERSION__}</span>
         </div>
       </nav>
 
@@ -110,18 +192,5 @@ export default function App() {
       </main>
     </div>
     </>
-  )
-}
-
-function NavBtn({ active, icon, label, onClick }: { active: boolean; icon: string; label: string; onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`w-14 h-14 rounded-xl flex flex-col items-center justify-center gap-0.5 text-xs font-semibold transition-all cursor-pointer border-none
-        ${active ? 'bg-bg text-ink' : 'bg-transparent text-bg/60 hover:bg-bg/10 hover:text-bg'}`}
-    >
-      <span className="text-lg">{icon}</span>
-      <span className="text-[10px] leading-tight">{label}</span>
-    </button>
   )
 }
