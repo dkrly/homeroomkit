@@ -13,6 +13,7 @@ import TimetableSchedule from './components/TimetableSchedule'
 import PrintButton from './components/PrintButton'
 import AssignmentTool from './components/AssignmentTool'
 import { hashPassword } from './utils/crypto'
+import DownloadStatus from './components/DownloadStatus'
 
 type TabId = 'students' | 'timetable' | 'teacher' | 'schedule' | 'combo' | 'role' | 'role1' | 'seating' | 'seating1' | 'bingo' | 'assignment' | 'settings'
 
@@ -276,6 +277,7 @@ export default function App() {
           </div>
         )}
       </main>
+      <DownloadStatus />
     </div>
     </>
   )
