@@ -100,7 +100,7 @@ export default function FriendBingo() {
       const container = document.querySelector('[data-capture]') as HTMLElement | null
       if (!container) return
       const dataUrl = await toPng(container, {
-        pixelRatio: 2,
+        pixelRatio: 1,
         backgroundColor: '#F6F7F2',
       })
       const link = document.createElement('a')

@@ -11,7 +11,7 @@ export default function DownloadButton({ disabled, inline }: { disabled?: boolea
     setSaving(true)
     try {
       const dataUrl = await toPng(container, {
-        pixelRatio: 2,
+        pixelRatio: 1,
         backgroundColor: '#F6F7F2',
       })
       const link = document.createElement('a')
