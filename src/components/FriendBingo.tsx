@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import html2canvas from 'html2canvas'
+import { toPng } from 'html-to-image'
 import PageHeader from './PageHeader'
 import DownloadButton from './PrintButton'
 import { useAppData } from '../store'
@@ -99,16 +99,15 @@ export default function FriendBingo() {
     try {
       const container = document.querySelector('[data-capture]') as HTMLElement | null
       if (!container) return
-      const canvas = await html2canvas(container, {
-        scale: 2,
-        useCORS: true,
+      const dataUrl = await toPng(container, {
+        pixelRatio: 2,
         backgroundColor: '#F6F7F2',
       })
       const link = document.createElement('a')
       const now = new Date()
       const ts = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`
       link.download = `homeroomkit_bingo_${ts}.png`
-      link.href = canvas.toDataURL('image/png')
+      link.href = dataUrl
       link.click()
     } finally {
       setBulkSaving(false)

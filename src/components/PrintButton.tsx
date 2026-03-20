@@ -1,26 +1,24 @@
 import { useCallback, useState } from 'react'
-import html2canvas from 'html2canvas'
+import { toPng } from 'html-to-image'
 
 export default function DownloadButton({ disabled, inline }: { disabled?: boolean; inline?: boolean } = {}) {
   const [saving, setSaving] = useState(false)
 
   const handleDownload = useCallback(async () => {
-    // 캡처 대상: 이 버튼의 부모의 .page 또는 바로 다음 형제
     const container = document.querySelector('[data-capture]') as HTMLElement | null
     if (!container) return
 
     setSaving(true)
     try {
-      const canvas = await html2canvas(container, {
-        scale: 2,
-        useCORS: true,
+      const dataUrl = await toPng(container, {
+        pixelRatio: 2,
         backgroundColor: '#F6F7F2',
       })
       const link = document.createElement('a')
       const now = new Date()
       const ts = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`
       link.download = `homeroomkit_${ts}.png`
-      link.href = canvas.toDataURL('image/png')
+      link.href = dataUrl
       link.click()
     } finally {
       setSaving(false)
