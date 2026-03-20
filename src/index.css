@@ -1,0 +1,111 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Noto Sans KR', sans-serif;
+  --font-display: 'Outfit', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --color-bg: #F6F7F2;
+  --color-ink: #1E2A1E;
+  --color-surface: #D6DACA;
+  --color-border: #D5DBCA;
+  --color-period-bg: #EAEDE2;
+  --color-period-fg: #B0B8A0;
+
+  --color-success: #2ecc71;
+  --color-success-hover: #27ae60;
+  --color-danger: #e74c3c;
+  --color-danger-hover: #c0392b;
+  --color-dark: #2c3e50;
+  --color-empty: #EFF1E8;
+}
+
+@layer base {
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    background: var(--color-surface);
+  }
+}
+
+.page {
+  width: 794px;
+  height: 1123px;
+  background: var(--color-bg);
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(30,42,30,0.06), 0 8px 32px rgba(30,42,30,0.1);
+  padding: 36px 32px 24px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* A2 가로 (594mm × 420mm → 2245px × 1587px @96dpi) */
+.page-a2 {
+  width: 2245px;
+  height: 1587px;
+  background: var(--color-bg);
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(30,42,30,0.06), 0 8px 32px rgba(30,42,30,0.1);
+  padding: 48px 48px 36px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+@keyframes pop {
+  0% { transform: scale(0.3); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); }
+}
+.animate-pop { animation: pop 0.4s ease-out; }
+
+.btn-action {
+  padding: 10px 20px;
+  color: white;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.15s;
+}
+
+@media print {
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: white;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  nav, .print\:hidden, button { display: none !important; }
+  .print-reset {
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+    overflow: visible !important;
+    zoom: 1 !important;
+  }
+  .page {
+    box-shadow: none;
+    border-radius: 0;
+    display: flex !important;
+    flex-direction: column !important;
+    margin: 0 auto !important;
+    padding: 36px 32px 24px !important;
+    page-break-after: always;
+  }
+  .page-a2 {
+    box-shadow: none;
+    border-radius: 0;
+    display: flex !important;
+    flex-direction: column !important;
+    margin: 0 !important;
+    padding: 12mm 12mm 8mm !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    page-break-after: always;
+  }
+}
