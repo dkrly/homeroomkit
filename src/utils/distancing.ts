@@ -2,18 +2,42 @@ import type { Student } from '../store'
 import { shuffleArray } from './shuffle'
 
 /**
- * 두 좌석 간 맨해튼 거리 계산
+ * 두 좌석이 인접한지 (8방향: 상하좌우 + 대각선)
  */
-function seatDistance(a: number, b: number, cols: number): number {
+function isAdjacent(a: number, b: number, cols: number): boolean {
   const ar = Math.floor(a / cols), ac = a % cols
   const br = Math.floor(b / cols), bc = b % cols
-  return Math.abs(ar - br) + Math.abs(ac - bc)
+  return Math.abs(ar - br) <= 1 && Math.abs(ac - bc) <= 1
 }
 
 /**
- * 거리두기 쌍을 고려한 셔플 배정
- * - 최대 200회 시도하여 모든 거리두기 쌍이 최소 거리 이상 떨어지게 배정
- * - 실패 시 가장 좋은 결과 반환
+ * 거리두기 쌍 중 인접 위반 수 계산
+ */
+function countViolations(
+  assignment: Map<number, Student>,
+  distanced: [number, number][],
+  cols: number,
+): number {
+  const numToSeat = new Map<number, number>()
+  for (const [seat, student] of assignment) {
+    numToSeat.set(student.num, seat)
+  }
+
+  let violations = 0
+  for (const [numA, numB] of distanced) {
+    const seatA = numToSeat.get(numA)
+    const seatB = numToSeat.get(numB)
+    if (seatA !== undefined && seatB !== undefined && isAdjacent(seatA, seatB, cols)) {
+      violations++
+    }
+  }
+  return violations
+}
+
+/**
+ * 거리두기 쌍이 인접하지 않도록 셔플
+ * - 최대 300회 시도하여 인접 위반 0인 결과 탐색
+ * - 실패 시 위반 가장 적은 결과 반환
  */
 export function shuffleWithDistancing(
   students: Student[],
@@ -23,7 +47,6 @@ export function shuffleWithDistancing(
   cols: number,
 ): Map<number, Student> {
   if (distanced.length === 0) {
-    // 거리두기 없으면 단순 셔플
     return simpleShuffle(students, activeIndices, fixedResult)
   }
 
@@ -31,13 +54,10 @@ export function shuffleWithDistancing(
   const freeStudents = students.filter(s => !fixedNums.has(s.num))
   const freeSeats = activeIndices.filter(idx => !fixedResult.has(idx))
 
-  // 최소 거리: 그리드 대각선의 절반 정도
-  const minDist = Math.max(3, Math.floor(Math.sqrt(freeSeats.length) * 0.6))
-
   let bestResult: Map<number, Student> | null = null
-  let bestScore = -1
+  let bestViolations = Infinity
 
-  for (let attempt = 0; attempt < 200; attempt++) {
+  for (let attempt = 0; attempt < 300; attempt++) {
     const shuffled = shuffleArray([...freeStudents])
     const result = new Map(fixedResult)
 
@@ -45,15 +65,11 @@ export function shuffleWithDistancing(
       result.set(freeSeats[i], shuffled[i])
     }
 
-    // 점수 계산: 모든 거리두기 쌍의 최소 거리
-    const score = calcDistanceScore(result, distanced, cols)
+    const v = countViolations(result, distanced, cols)
+    if (v === 0) return result
 
-    if (score >= minDist * distanced.length) {
-      return result // 충분히 떨어져 있으면 즉시 반환
-    }
-
-    if (score > bestScore) {
-      bestScore = score
+    if (v < bestViolations) {
+      bestViolations = v
       bestResult = result
     }
   }
@@ -76,26 +92,4 @@ function simpleShuffle(
     if (si < freeStudents.length) result.set(idx, freeStudents[si++])
   }
   return result
-}
-
-function calcDistanceScore(
-  assignment: Map<number, Student>,
-  distanced: [number, number][],
-  cols: number,
-): number {
-  // 번호 → 좌석 인덱스 매핑
-  const numToSeat = new Map<number, number>()
-  for (const [seat, student] of assignment) {
-    numToSeat.set(student.num, seat)
-  }
-
-  let totalDist = 0
-  for (const [numA, numB] of distanced) {
-    const seatA = numToSeat.get(numA)
-    const seatB = numToSeat.get(numB)
-    if (seatA !== undefined && seatB !== undefined) {
-      totalDist += seatDistance(seatA, seatB, cols)
-    }
-  }
-  return totalDist
 }
