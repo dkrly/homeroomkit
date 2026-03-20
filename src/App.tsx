@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import ClassTimetable from './components/ClassTimetable'
 import Schedule from './components/Schedule'
 import RoleAssign from './components/RoleAssign'
@@ -12,6 +12,7 @@ import Settings from './components/Settings'
 import TimetableSchedule from './components/TimetableSchedule'
 import PrintButton from './components/PrintButton'
 import AssignmentTool from './components/AssignmentTool'
+import { hashPassword } from './utils/crypto'
 
 type TabId = 'students' | 'timetable' | 'teacher' | 'schedule' | 'combo' | 'role' | 'role1' | 'seating' | 'seating1' | 'bingo' | 'assignment' | 'settings'
 
@@ -77,6 +78,10 @@ export default function App() {
   const [tab, setTab] = useState<TabId>('timetable')
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [zoom, setZoom] = useState(loadZoom)
+  const [settingsAuthed, setSettingsAuthed] = useState(false)
+  const [settingsPending, setSettingsPending] = useState(false)
+  const [settingsPw, setSettingsPw] = useState('')
+  const [settingsErr, setSettingsErr] = useState('')
   const tapCount = useRef(0)
   const tapTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
   const Page = pages[tab]
@@ -86,12 +91,30 @@ export default function App() {
     clearTimeout(tapTimer.current)
     if (tapCount.current >= 5) {
       tapCount.current = 0
-      setTab('settings')
-      setDrawerOpen(false)
+      if (settingsAuthed) {
+        setTab('settings')
+        setDrawerOpen(false)
+      } else {
+        setSettingsPending(true)
+        setDrawerOpen(false)
+      }
     } else {
       tapTimer.current = setTimeout(() => { tapCount.current = 0 }, 1500)
     }
   }
+
+  const handleSettingsLogin = useCallback(async () => {
+    setSettingsErr('')
+    const hash = await hashPassword(settingsPw)
+    if (hash === __PASSWORD_HASH__) {
+      setSettingsAuthed(true)
+      setSettingsPending(false)
+      setSettingsPw('')
+      setTab('settings')
+    } else {
+      setSettingsErr('비밀번호가 틀렸습니다')
+    }
+  }, [settingsPw])
 
   const selectTab = (id: TabId) => {
     setTab(id)
@@ -213,10 +236,43 @@ export default function App() {
 
       {/* 메인 콘텐츠 */}
       <main className="print-reset flex-1 flex justify-center items-start overflow-auto p-8 pt-16">
-        <div className="print-reset origin-top" style={{ zoom }}>
-          {!noPrintButton.has(tab) && <PrintButton />}
-          <Page />
-        </div>
+        {settingsPending && !settingsAuthed ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="rounded-2xl p-8 w-80" style={{ background: '#fff', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
+              <h2 className="text-lg font-bold mb-1" style={{ color: '#1E2A1E' }}>설정</h2>
+              <p className="text-sm mb-4" style={{ color: '#1E2A1E', opacity: 0.5 }}>비밀번호를 입력하세요</p>
+              <form onSubmit={e => { e.preventDefault(); handleSettingsLogin() }}>
+                <input
+                  type="password"
+                  value={settingsPw}
+                  onChange={e => { setSettingsPw(e.target.value); setSettingsErr('') }}
+                  className="w-full px-3 py-2 rounded-lg text-sm mb-2"
+                  style={{ border: '1px solid #ddd', outline: 'none' }}
+                  placeholder="비밀번호"
+                  autoFocus
+                />
+                {settingsErr && <p className="text-xs mb-2" style={{ color: '#e74c3c' }}>{settingsErr}</p>}
+                <div className="flex gap-2">
+                  <button type="submit"
+                    className="flex-1 py-2 rounded-lg font-bold text-sm border-none cursor-pointer"
+                    style={{ background: '#1E2A1E', color: '#F6F7F2' }}>
+                    확인
+                  </button>
+                  <button type="button" onClick={() => { setSettingsPending(false); setSettingsPw(''); setSettingsErr('') }}
+                    className="px-4 py-2 rounded-lg text-sm border-none cursor-pointer"
+                    style={{ background: '#eee', color: '#666' }}>
+                    취소
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        ) : (
+          <div className="print-reset origin-top" style={{ zoom }}>
+            {!noPrintButton.has(tab) && <PrintButton />}
+            <Page />
+          </div>
+        )}
       </main>
     </div>
     </>
