@@ -11,9 +11,10 @@ import FriendBingo from './components/FriendBingo'
 import Settings from './components/Settings'
 import TimetableSchedule from './components/TimetableSchedule'
 import PrintButton from './components/PrintButton'
+import AssignmentTool from './components/AssignmentTool'
 import { useLogout } from './components/PasswordGate'
 
-type TabId = 'students' | 'timetable' | 'teacher' | 'schedule' | 'combo' | 'role' | 'role1' | 'seating' | 'seating1' | 'bingo' | 'settings'
+type TabId = 'students' | 'timetable' | 'teacher' | 'schedule' | 'combo' | 'role' | 'role1' | 'seating' | 'seating1' | 'bingo' | 'assignment' | 'settings'
 
 interface NavGroup {
   icon: string
@@ -38,6 +39,7 @@ const navGroups: NavGroup[] = [
     { id: 'seating1', label: '우리반 자리' },
   ]},
   { icon: '🔍', label: '친구탐험', items: [{ id: 'bingo', label: '친구탐험' }] },
+  { icon: '📊', label: '배정', items: [{ id: 'assignment', label: '주제선택 배정' }] },
 ]
 
 const pages: Record<TabId, React.FC> = {
@@ -51,10 +53,11 @@ const pages: Record<TabId, React.FC> = {
   seating1: SeatingSemester1,
   bingo: FriendBingo,
   combo: TimetableSchedule,
+  assignment: AssignmentTool,
   settings: Settings,
 }
 
-const noPrintButton = new Set<TabId>(['role', 'role1', 'seating', 'seating1', 'bingo', 'settings'])
+const noPrintButton = new Set<TabId>(['role', 'role1', 'seating', 'seating1', 'bingo', 'assignment', 'settings'])
 
 const ZOOM_STEP = 0.1
 const ZOOM_MIN = 0.5
