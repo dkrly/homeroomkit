@@ -10,7 +10,7 @@ import RoleSemester1 from './components/RoleSemester1'
 import FriendBingo from './components/FriendBingo'
 import Settings from './components/Settings'
 import TimetableSchedule from './components/TimetableSchedule'
-import DownloadButton from './components/PrintButton'
+import PrintButton from './components/PrintButton'
 import AssignmentTool from './components/AssignmentTool'
 import { hashPassword } from './utils/crypto'
 
@@ -57,7 +57,7 @@ const pages: Record<TabId, React.FC> = {
   settings: Settings,
 }
 
-const noDownloadButton = new Set<TabId>(['role', 'role1', 'seating', 'seating1', 'bingo', 'assignment', 'settings'])
+const noPrintButton = new Set<TabId>(['role', 'role1', 'seating', 'seating1', 'bingo', 'assignment', 'settings'])
 
 const ZOOM_STEP = 0.1
 const ZOOM_MIN = 0.5
@@ -268,11 +268,9 @@ export default function App() {
             </div>
           </div>
         ) : (
-          <div className="origin-top" style={{ zoom }}>
-            {!noDownloadButton.has(tab) && <DownloadButton />}
-            <div data-capture>
-              <Page />
-            </div>
+          <div className="print-reset origin-top" style={{ zoom }}>
+            {!noPrintButton.has(tab) && <PrintButton />}
+            <Page />
           </div>
         )}
       </main>

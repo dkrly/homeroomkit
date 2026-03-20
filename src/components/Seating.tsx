@@ -6,7 +6,7 @@ import { shuffleArray } from '../utils/shuffle'
 import { useShuffleReveal } from '../utils/useShuffleReveal'
 import { buildDisabled } from '../utils/seating'
 import PageHeader from './PageHeader'
-import DownloadButton from './PrintButton'
+import PrintButton from './PrintButton'
 
 const SEATING_REVEAL_INTERVAL = 200
 const ROLLING_TICK_INTERVAL = 60
@@ -155,11 +155,10 @@ export default function Seating() {
             className={`btn-action ${phase === 'spinning' || phase === 'stopping' ? 'bg-ink/10 !text-ink/30 cursor-not-allowed' : 'bg-ink/20 !text-ink hover:bg-ink/30'}`}>
             초기화
           </button>
-          <DownloadButton disabled={phase !== 'done'} inline />
+          <PrintButton disabled={phase !== 'done'} inline />
         </div>
       </div>
 
-      <div data-capture>
       <div className="page h-[calc(100vh-7rem)] print:!h-[1123px]">
         <PageHeader badge="Seat" title="자리 배치표"
           extra={activeIndices.length !== students.length
@@ -247,7 +246,6 @@ export default function Seating() {
             )
           })}
         </div>
-      </div>
       </div>
 
       {/* 쌍둥이 페이지 — 칠판 아래 (인쇄 전용) */}
