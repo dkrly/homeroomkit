@@ -19,6 +19,7 @@ export default function PrintButton({ disabled, inline }: { disabled?: boolean; 
         scale: 2,
         useCORS: true,
         backgroundColor: '#F6F7F2',
+        foreignObjectRendering: true,
       })
 
       // zoom 복원
