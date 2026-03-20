@@ -112,62 +112,72 @@ export default function App() {
     <div className="print-reset flex h-screen relative">
       {/* 햄버거 버튼 */}
       <button onClick={() => setDrawerOpen(true)}
-        className="fixed top-4 left-4 z-40 w-10 h-10 rounded-xl bg-ink text-bg flex items-center justify-center border-none cursor-pointer text-lg print:hidden shadow-lg"
-        style={{ display: drawerOpen ? 'none' : 'flex' }}>
-        ☰
+        className="fixed top-4 left-4 z-40 w-11 h-11 rounded-2xl bg-ink/90 text-bg flex items-center justify-center border-none cursor-pointer print:hidden backdrop-blur-sm"
+        style={{ display: drawerOpen ? 'none' : 'flex', boxShadow: '0 2px 12px rgba(30,42,30,0.15)' }}>
+        <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+          <path d="M1 1h16M1 7h16M1 13h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+        </svg>
       </button>
 
       {/* 오버레이 */}
-      {drawerOpen && (
-        <div className="fixed inset-0 z-40 bg-black/30 print:hidden"
-          onClick={() => setDrawerOpen(false)} />
-      )}
+      <div className={`fixed inset-0 z-40 print:hidden transition-colors duration-200
+        ${drawerOpen ? 'bg-black/25 pointer-events-auto' : 'bg-transparent pointer-events-none'}`}
+        onClick={() => setDrawerOpen(false)} />
 
       {/* 드로어 */}
-      <nav className={`fixed top-0 left-0 z-50 h-full w-64 bg-ink flex flex-col print:hidden transition-transform duration-200 ease-out shadow-2xl
-        ${drawerOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="flex items-center justify-between px-5 py-4">
-          <span className="text-bg font-bold text-sm">담임 운영 키트</span>
+      <nav className={`fixed top-0 left-0 z-50 h-full w-72 bg-ink flex flex-col print:hidden transition-transform duration-200 ease-out
+        ${drawerOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        style={{ boxShadow: drawerOpen ? '4px 0 24px rgba(0,0,0,0.2)' : 'none' }}>
+
+        {/* 헤더 */}
+        <div className="flex items-center justify-between px-6 h-16 shrink-0"
+          style={{ borderBottom: '1px solid rgba(246,247,242,0.08)' }}>
+          <span className="text-bg font-bold tracking-tight">담임 운영 키트</span>
           <button onClick={() => setDrawerOpen(false)}
-            className="w-8 h-8 rounded-lg bg-bg/10 text-bg/60 hover:bg-bg/20 hover:text-bg border-none cursor-pointer text-lg">
+            className="w-8 h-8 rounded-lg bg-bg/5 text-bg/40 hover:bg-bg/15 hover:text-bg border-none cursor-pointer text-sm transition-colors">
             ✕
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-3 pb-4">
+        {/* 메뉴 */}
+        <div className="flex-1 overflow-y-auto py-4 px-3">
           {navGroups.map((group, gi) => {
             const isActiveGroup = group.items.some(i => i.id === tab)
             const isSingle = group.items.length === 1
 
             return (
-              <div key={gi} className="mb-1">
+              <div key={gi} className={gi > 0 ? 'mt-1' : ''}>
                 {isSingle ? (
                   <button
                     onClick={() => selectTab(group.items[0].id)}
-                    className={`w-full h-11 rounded-xl flex items-center gap-3 px-4 transition-all cursor-pointer border-none text-sm font-semibold
-                      ${isActiveGroup ? 'bg-bg text-ink' : 'bg-transparent text-bg/60 hover:bg-bg/10 hover:text-bg'}`}
+                    className={`w-full h-11 rounded-xl flex items-center gap-3 px-4 transition-all cursor-pointer border-none text-[13px] font-semibold relative
+                      ${isActiveGroup ? 'bg-bg text-ink' : 'bg-transparent text-bg/60 hover:bg-bg/8 hover:text-bg'}`}
                   >
-                    <span className="text-lg">{group.icon}</span>
+                    <span className="text-base w-6 text-center">{group.icon}</span>
                     {group.label}
                   </button>
                 ) : (
                   <>
-                    <div className={`w-full h-9 flex items-center gap-3 px-4 text-xs font-bold uppercase tracking-wider
-                      ${isActiveGroup ? 'text-bg' : 'text-bg/40'}`}>
-                      <span className="text-base">{group.icon}</span>
+                    <div className={`flex items-center gap-3 px-4 h-9 text-[11px] font-bold uppercase tracking-widest mt-2 mb-0.5
+                      ${isActiveGroup ? 'text-bg/70' : 'text-bg/30'}`}>
+                      <span className="text-sm w-6 text-center">{group.icon}</span>
                       {group.label}
                     </div>
-                    <div className="flex flex-col gap-0.5 ml-4">
+                    <div className="flex flex-col gap-px">
                       {group.items.map(item => (
                         <button
                           key={item.id}
                           onClick={() => selectTab(item.id)}
-                          className={`w-full h-9 rounded-lg flex items-center px-4 text-sm font-medium transition-all cursor-pointer border-none
+                          className={`w-full h-10 rounded-xl flex items-center text-[13px] font-medium transition-all cursor-pointer border-none relative
                             ${tab === item.id
                               ? 'bg-bg text-ink'
-                              : 'bg-transparent text-bg/50 hover:bg-bg/10 hover:text-bg'
+                              : 'bg-transparent text-bg/50 hover:bg-bg/8 hover:text-bg'
                             }`}
+                          style={{ paddingLeft: '3.25rem' }}
                         >
+                          {tab === item.id && (
+                            <div className="absolute left-4 top-1/2 -translate-y-1/2 w-1 h-5 rounded-full bg-ink" />
+                          )}
                           {item.label}
                         </button>
                       ))}
@@ -179,20 +189,23 @@ export default function App() {
           })}
         </div>
 
-        <div className="px-5 py-4 flex flex-col gap-3 border-t border-bg/10">
-          <div className="flex items-center gap-2">
+        {/* 하단 */}
+        <div className="px-6 py-5 shrink-0" style={{ borderTop: '1px solid rgba(246,247,242,0.08)' }}>
+          <div className="flex items-center gap-1.5 mb-3">
             <button onClick={() => changeZoom(-ZOOM_STEP)}
-              className="w-8 h-8 rounded-lg bg-bg/10 text-bg/60 hover:bg-bg/20 hover:text-bg border-none cursor-pointer text-sm font-bold">
-              -
+              className="w-9 h-9 rounded-xl bg-bg/8 text-bg/50 hover:bg-bg/15 hover:text-bg border-none cursor-pointer text-sm font-bold transition-colors">
+              −
             </button>
-            <span className="text-xs text-bg/40 w-10 text-center">{Math.round(zoom * 100)}%</span>
+            <div className="flex-1 text-center">
+              <span className="text-xs text-bg/40 font-mono">{Math.round(zoom * 100)}%</span>
+            </div>
             <button onClick={() => changeZoom(ZOOM_STEP)}
-              className="w-8 h-8 rounded-lg bg-bg/10 text-bg/60 hover:bg-bg/20 hover:text-bg border-none cursor-pointer text-sm font-bold">
+              className="w-9 h-9 rounded-xl bg-bg/8 text-bg/50 hover:bg-bg/15 hover:text-bg border-none cursor-pointer text-sm font-bold transition-colors">
               +
             </button>
           </div>
           <span onClick={handleVersionTap}
-            className="text-[9px] text-bg/30 cursor-default select-none">
+            className="text-[10px] text-bg/20 cursor-default select-none block">
             {__BUILD_VERSION__}
           </span>
         </div>
