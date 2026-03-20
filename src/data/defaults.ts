@@ -28,6 +28,7 @@ export const defaultSeating: SeatingConfig = {
   rows: 7, cols: 5,
   disabled: [],
   fixed: {},
+  distanced: [],
 }
 
 export const defaultBingoQuestions: BingoQuestion[] = [

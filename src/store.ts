@@ -24,6 +24,7 @@ export interface SeatingConfig {
   cols: number
   disabled: number[]
   fixed: Record<number, number>
+  distanced: [number, number][]
 }
 
 export type BingoDifficulty = 'easy' | 'medium' | 'hard'

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useAppData, setData } from '../store'
 import type { Student } from '../store'
 import { getStudentColor } from '../utils/colors'
-import { shuffleArray } from '../utils/shuffle'
+import { shuffleWithDistancing } from '../utils/distancing'
 import { useShuffleReveal } from '../utils/useShuffleReveal'
 import { buildDisabled } from '../utils/seating'
 import PageHeader from './PageHeader'
@@ -109,18 +109,11 @@ export default function Seating() {
   }, [buildFixedResult, students, cols, rows, disabledSet, finishImmediately])
 
   const startSpin = useCallback(() => {
-    const { result, usedNums } = buildFixedResult()
-    const freeStudents = shuffleArray(students.filter(s => !usedNums.has(s.num)))
-
-    let studentIdx = 0
-    for (const idx of activeIndices) {
-      if (result.has(idx)) continue
-      if (studentIdx < freeStudents.length) result.set(idx, freeStudents[studentIdx++])
-    }
-
-    setAssigned(result)
+    const { result } = buildFixedResult()
+    const assigned = shuffleWithDistancing(students, activeIndices, result, seating.distanced || [], cols)
+    setAssigned(assigned)
     startShuffleReveal()
-  }, [buildFixedResult, students, activeIndices, startShuffleReveal])
+  }, [buildFixedResult, students, activeIndices, seating, cols, startShuffleReveal])
 
   const handleReset = useCallback(() => {
     if (phase === 'done' || phase === 'ready') {
