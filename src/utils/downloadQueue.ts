@@ -54,6 +54,9 @@ async function processNext() {
   job.phase = 'capturing'
   notify()
 
+  // UI 스레드에 여유를 주고 시작
+  await new Promise(r => setTimeout(r, 50))
+
   // 프로그레스 애니메이션
   const start = Date.now()
   const tick = () => {
