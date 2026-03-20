@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import ClassTimetable from './components/ClassTimetable'
 import Schedule from './components/Schedule'
 import RoleAssign from './components/RoleAssign'
@@ -81,7 +81,21 @@ export default function App() {
   const [tab, setTab] = useState<TabId>('timetable')
   const [openGroup, setOpenGroup] = useState<number>(groupIndexOf('timetable'))
   const [zoom, setZoom] = useState(loadZoom)
+  const tapCount = useRef(0)
+  const tapTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
   const Page = pages[tab]
+
+  const handleVersionTap = () => {
+    tapCount.current++
+    clearTimeout(tapTimer.current)
+    if (tapCount.current >= 5) {
+      tapCount.current = 0
+      setTab('settings')
+      setOpenGroup(-1)
+    } else {
+      tapTimer.current = setTimeout(() => { tapCount.current = 0 }, 1500)
+    }
+  }
 
   const handleGroupClick = (gi: number, group: NavGroup) => {
     if (group.items.length === 1) {
@@ -158,14 +172,6 @@ export default function App() {
         </div>
 
         <div className="mt-auto flex flex-col items-center gap-2 pt-2">
-          <button
-            onClick={() => { setTab('settings'); setOpenGroup(-1) }}
-            className={`w-16 h-12 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer border-none
-              ${tab === 'settings' ? 'bg-bg text-ink' : 'bg-transparent text-bg/60 hover:bg-bg/10 hover:text-bg'}`}
-          >
-            <span className="text-base">⚙️</span>
-            <span className="text-[9px] leading-tight font-semibold">설정</span>
-          </button>
           <div className="flex items-center gap-1">
             <button onClick={() => changeZoom(-ZOOM_STEP)}
               className="w-7 h-7 rounded-lg bg-bg/10 text-bg/60 hover:bg-bg/20 hover:text-bg border-none cursor-pointer text-sm font-bold">
@@ -177,7 +183,10 @@ export default function App() {
               +
             </button>
           </div>
-          <span className="text-[7px] text-bg/30 leading-tight text-center break-all px-1">{__BUILD_VERSION__}</span>
+          <span onClick={handleVersionTap}
+            className="text-[7px] text-bg/30 leading-tight text-center break-all px-1 cursor-default select-none">
+            {__BUILD_VERSION__}
+          </span>
         </div>
       </nav>
 
