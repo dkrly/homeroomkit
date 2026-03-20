@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
+import html2canvas from 'html2canvas'
 import PageHeader from './PageHeader'
-import PrintButton from './PrintButton'
+import DownloadButton from './PrintButton'
 import { useAppData } from '../store'
 import type { BingoQuestion } from '../store'
 
@@ -85,18 +86,39 @@ export default function FriendBingo() {
   const [items, setItems] = useState<BingoItem[]>(() => pick(bingoQuestions))
   const [bulkSheets, setBulkSheets] = useState<BingoItem[][] | null>(null)
 
-  const handleBulkPrint = () => {
+  const [bulkSaving, setBulkSaving] = useState(false)
+
+  const handleBulkDownload = useCallback(async () => {
     const sheets = Array.from({ length: BULK_COUNT }, () => pick(bingoQuestions))
     setBulkSheets(sheets)
-    requestAnimationFrame(() => {
-      window.print()
+    setBulkSaving(true)
+
+    // Wait for DOM to render
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))
+
+    try {
+      const container = document.querySelector('[data-capture]') as HTMLElement | null
+      if (!container) return
+      const canvas = await html2canvas(container, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#F6F7F2',
+      })
+      const link = document.createElement('a')
+      const now = new Date()
+      const ts = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`
+      link.download = `homeroomkit_bingo_${ts}.png`
+      link.href = canvas.toDataURL('image/png')
+      link.click()
+    } finally {
+      setBulkSaving(false)
       setBulkSheets(null)
-    })
-  }
+    }
+  }, [bingoQuestions])
 
   if (bulkSheets) {
     return (
-      <div>
+      <div data-capture>
         {bulkSheets.map((sheet, i) => (
           <BingoSheet key={i} items={sheet} />
         ))}
@@ -116,22 +138,26 @@ export default function FriendBingo() {
           </svg>
           섞기
         </button>
-        <PrintButton inline />
+        <DownloadButton inline />
       </div>
 
-      <BingoSheet items={items} />
+      <div data-capture>
+        <BingoSheet items={items} />
+      </div>
 
       <div className="flex justify-center mt-6 print:hidden">
         <button
-          onClick={handleBulkPrint}
-          className="flex items-center gap-2 border-none px-6 py-3 rounded-lg font-display text-[13px] font-semibold transition-all shadow-md bg-ink text-bg cursor-pointer hover:bg-[#2A3D2A] hover:-translate-y-0.5"
+          onClick={handleBulkDownload}
+          disabled={bulkSaving}
+          className={`flex items-center gap-2 border-none px-6 py-3 rounded-lg font-display text-[13px] font-semibold transition-all shadow-md
+            ${bulkSaving ? 'bg-ink/20 text-ink/30 cursor-not-allowed' : 'bg-ink text-bg cursor-pointer hover:bg-[#2A3D2A] hover:-translate-y-0.5'}`}
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="6 9 6 2 18 2 18 9"/>
-            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
-            <rect x="6" y="14" width="12" height="8"/>
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
           </svg>
-          전부 다르게 {BULK_COUNT}장 인쇄
+          {bulkSaving ? '저장 중...' : `전부 다르게 ${BULK_COUNT}장 PNG 저장`}
         </button>
       </div>
     </div>
