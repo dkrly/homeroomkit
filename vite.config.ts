@@ -8,9 +8,8 @@ function getBuildVersion(): string {
   try {
     const dirty = execSync('git status --porcelain').toString().trim()
     if (dirty) return 'dirty'
-    const hash = execSync('git rev-parse --short HEAD').toString().trim()
-    const date = execSync('git log -1 --format=%cd --date=format:%Y%m%d%H%M%S').toString().trim()
-    return `${date}-${hash}`
+    const date = execSync('git log -1 --format=%cd --date=format:%Y-%m-%d\\ %H:%M:%S').toString().trim()
+    return date
   } catch {
     return 'unknown'
   }
