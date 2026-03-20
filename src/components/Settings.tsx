@@ -4,6 +4,7 @@ import { useAppData, setData } from '../store'
 import type { FixedRole, VariableRole, BingoQuestion, BingoDifficulty } from '../store'
 import { toggleSet } from '../utils/set'
 import { buildDisabled } from '../utils/seating'
+import { LoadPreset } from './PasswordGate'
 
 const settingsTabs = [
   { id: 'students', label: '학생 목록' },
@@ -69,6 +70,13 @@ function matrixToStudents(data: Row[]) {
 function StudentsTab() {
   const { students } = useAppData()
   const [data, setSheetData] = useState<Row[]>(studentsToMatrix(students))
+  const [prevLen, setPrevLen] = useState(students.length)
+
+  // 프리셋 로드 시 시트 갱신
+  if (students.length !== prevLen) {
+    setSheetData(studentsToMatrix(students))
+    setPrevLen(students.length)
+  }
 
   const valid = matrixToStudents(data)
 
@@ -80,8 +88,11 @@ function StudentsTab() {
 
   return (
     <div>
-      <div className="flex items-baseline justify-between mb-2">
-        <p className="text-sm text-ink/50">엑셀에서 복사 붙여넣기 가능</p>
+      <div className="flex items-center justify-between mb-3 gap-3">
+        <div className="flex items-center gap-3">
+          <p className="text-sm text-ink/50">엑셀에서 복사 붙여넣기 가능</p>
+          <LoadPreset />
+        </div>
         <span className="text-sm font-bold text-ink">{valid.length}명</span>
       </div>
       <Spreadsheet

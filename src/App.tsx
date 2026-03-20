@@ -12,7 +12,6 @@ import Settings from './components/Settings'
 import TimetableSchedule from './components/TimetableSchedule'
 import PrintButton from './components/PrintButton'
 import AssignmentTool from './components/AssignmentTool'
-import { useAuth, LoginForm } from './components/PasswordGate'
 
 type TabId = 'students' | 'timetable' | 'teacher' | 'schedule' | 'combo' | 'role' | 'role1' | 'seating' | 'seating1' | 'bingo' | 'assignment' | 'settings'
 
@@ -57,8 +56,6 @@ const pages: Record<TabId, React.FC> = {
   settings: Settings,
 }
 
-// 학생 데이터가 필요한 탭
-const protectedTabs = new Set<TabId>(['students', 'role', 'role1', 'seating', 'seating1', 'bingo', 'settings'])
 const noPrintButton = new Set<TabId>(['role', 'role1', 'seating', 'seating1', 'bingo', 'assignment', 'settings'])
 
 const ZOOM_STEP = 0.1
@@ -81,13 +78,10 @@ function groupIndexOf(tab: TabId): number {
 }
 
 export default function App() {
-  const { authed, checking, logout } = useAuth()
   const [tab, setTab] = useState<TabId>('timetable')
   const [openGroup, setOpenGroup] = useState<number>(groupIndexOf('timetable'))
   const [zoom, setZoom] = useState(loadZoom)
   const Page = pages[tab]
-
-  const needsAuth = protectedTabs.has(tab) && !authed
 
   const handleGroupClick = (gi: number, group: NavGroup) => {
     if (group.items.length === 1) {
@@ -109,14 +103,6 @@ export default function App() {
       localStorage.setItem(ZOOM_KEY, String(next))
       return next
     })
-  }
-
-  if (checking) {
-    return (
-      <div className="flex h-screen items-center justify-center" style={{ background: '#F6F7F2' }}>
-        <div style={{ color: '#1E2A1E', opacity: 0.4 }}>Loading...</div>
-      </div>
-    )
   }
 
   return (
@@ -191,28 +177,14 @@ export default function App() {
               +
             </button>
           </div>
-          {authed ? (
-            <button onClick={logout}
-              className="w-14 h-7 rounded-lg bg-bg/10 text-bg/50 hover:bg-bg/20 hover:text-bg border-none cursor-pointer text-[9px] font-semibold">
-              로그아웃
-            </button>
-          ) : (
-            <span className="text-[9px] text-bg/40">비로그인</span>
-          )}
           <span className="text-[7px] text-bg/30 leading-tight text-center break-all px-1">{__BUILD_VERSION__}</span>
         </div>
       </nav>
 
       <main className="print-reset flex-1 flex justify-center items-start overflow-auto p-8">
         <div className="print-reset origin-top" style={{ zoom }}>
-          {needsAuth ? (
-            <LoginForm />
-          ) : (
-            <>
-              {!noPrintButton.has(tab) && <PrintButton />}
-              <Page />
-            </>
-          )}
+          {!noPrintButton.has(tab) && <PrintButton />}
+          <Page />
         </div>
       </main>
     </div>

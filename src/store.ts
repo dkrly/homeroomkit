@@ -44,17 +44,13 @@ export interface AppData {
   bingoQuestions: BingoQuestion[]
 }
 
-let defaultStudentList: Student[] = []
-
-function makeDefaultData(): AppData {
-  return {
-    students: defaultStudentList,
-    fixedRoles: defaultFixedRoles,
-    variableRoles: defaultVariableRoles,
-    roleSelectedNums: [],
-    seating: defaultSeating,
-    bingoQuestions: defaultBingoQuestions,
-  }
+const defaultData: AppData = {
+  students: [],
+  fixedRoles: defaultFixedRoles,
+  variableRoles: defaultVariableRoles,
+  roleSelectedNums: [],
+  seating: defaultSeating,
+  bingoQuestions: defaultBingoQuestions,
 }
 
 function migrate(data: Record<string, unknown>): Record<string, unknown> {
@@ -70,15 +66,15 @@ function migrate(data: Record<string, unknown>): Record<string, unknown> {
 function load(): AppData {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return makeDefaultData()
+    if (!raw) return defaultData
     const parsed = migrate(JSON.parse(raw))
     const students = parsed.students as unknown[]
     if (students?.[0] && typeof students[0] !== 'object') {
-      return makeDefaultData()
+      return defaultData
     }
-    return { ...makeDefaultData(), ...parsed } as AppData
+    return { ...defaultData, ...parsed } as AppData
   } catch {
-    return makeDefaultData()
+    return defaultData
   }
 }
 
@@ -86,17 +82,8 @@ function save(data: AppData) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
 }
 
-let current = makeDefaultData()
+let current = load()
 const listeners = new Set<() => void>()
-
-export function initStore(decryptedStudents: Student[]) {
-  defaultStudentList = decryptedStudents
-  current = load()
-  if (current.students.length === 0) {
-    current = { ...current, students: decryptedStudents }
-  }
-  listeners.forEach(fn => fn())
-}
 
 export function setData(partial: Partial<AppData>) {
   current = { ...current, ...partial }
