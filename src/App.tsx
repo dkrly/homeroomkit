@@ -11,6 +11,7 @@ import FriendBingo from './components/FriendBingo'
 import Settings from './components/Settings'
 import TimetableSchedule from './components/TimetableSchedule'
 import PrintButton from './components/PrintButton'
+import { useLogout } from './components/PasswordGate'
 
 const tabs = [
   { id: 'students', label: '학생', icon: '👥' },
@@ -59,6 +60,7 @@ const pageStyle = (tab: TabId) =>
     : '@page { size: A4 portrait; margin: 0; }'
 
 export default function App() {
+  const logout = useLogout()
   const [tab, setTab] = useState<TabId>('timetable')
   const [zoom, setZoom] = useState(loadZoom)
   const Page = pages[tab]
@@ -92,6 +94,10 @@ export default function App() {
               +
             </button>
           </div>
+          <button onClick={logout}
+            className="w-14 h-8 rounded-lg bg-bg/10 text-bg/50 hover:bg-bg/20 hover:text-bg border-none cursor-pointer text-[10px] font-semibold">
+            로그아웃
+          </button>
           <span className="text-[8px] text-bg/30 leading-tight text-center break-all px-1">{__BUILD_VERSION__}</span>
         </div>
       </nav>

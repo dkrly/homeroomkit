@@ -1,9 +1,12 @@
-import { useState, useEffect, type ReactNode } from 'react'
+import { useState, useEffect, createContext, useContext, type ReactNode } from 'react'
 import { hashPassword, decryptStudents } from '../utils/crypto'
 import { initStore } from '../store'
 import type { Student } from '../store'
 
 const SESSION_KEY = 'homeroomkit-authed'
+
+const LogoutContext = createContext<() => void>(() => {})
+export const useLogout = () => useContext(LogoutContext)
 
 export default function PasswordGate({ children }: { children: ReactNode }) {
   const [state, setState] = useState<'checking' | 'locked' | 'unlocked'>('checking')
@@ -43,6 +46,13 @@ export default function PasswordGate({ children }: { children: ReactNode }) {
     }
   }
 
+  function logout() {
+    sessionStorage.removeItem(SESSION_KEY)
+    setState('locked')
+    setInput('')
+    setError('')
+  }
+
   if (state === 'checking') {
     return (
       <div className="flex h-screen items-center justify-center" style={{ background: '#F6F7F2' }}>
@@ -79,5 +89,5 @@ export default function PasswordGate({ children }: { children: ReactNode }) {
     )
   }
 
-  return <>{children}</>
+  return <LogoutContext.Provider value={logout}>{children}</LogoutContext.Provider>
 }
