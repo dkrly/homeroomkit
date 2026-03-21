@@ -10,7 +10,7 @@ export function ScheduleContent() {
           className="flex-1 flex items-center rounded-xl relative overflow-hidden px-5"
           style={{ background: row.bg, color: row.fg }}
         >
-          <div className="absolute left-0 top-[10%] bottom-[10%] w-1.5 rounded-r" style={{ background: row.bar }} />
+          <div className="absolute left-0 top-[15%] bottom-[15%] w-[5px] rounded-r-sm" style={{ background: row.bar }} />
           <div className="text-4xl font-black whitespace-nowrap min-w-[220px]">
             {row.emoji} {row.label}
           </div>
