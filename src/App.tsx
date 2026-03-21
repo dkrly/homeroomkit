@@ -21,14 +21,14 @@ interface NavGroup {
 
 const navGroups: NavGroup[] = [
   { icon: '👥', label: '학생', items: [{ id: 'students', label: '학생' }] },
-  { icon: '📋', label: '시간표', items: [
-    { id: 'timetable', label: '1학년2반' },
-    { id: 'teacher', label: '정보' },
+  { icon: '🧑‍🏫', label: '정보 시간표', items: [{ id: 'teacher', label: '정보 시간표' }] },
+  { icon: '🏫', label: '우리반', items: [
+    { id: 'timetable', label: '시간표' },
     { id: 'schedule', label: '일과운영표' },
     { id: 'combo', label: '시간+일과' },
+    { id: 'role', label: '역할' },
+    { id: 'seating', label: '자리' },
   ]},
-  { icon: '🎲', label: '우리반 역할', items: [{ id: 'role', label: '우리반 역할' }] },
-  { icon: '💺', label: '우리반 자리', items: [{ id: 'seating', label: '우리반 자리' }] },
   { icon: '🛠️', label: '도구', items: [
     { id: 'bingo', label: '친구탐험' },
     { id: 'assignment', label: '주제선택 배정' },
