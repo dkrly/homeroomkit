@@ -13,27 +13,17 @@ export default function RoleAssign() {
   const appData = useAppData()
   const { students: allStudents, fixedRoles, variableRoles, roleSelectedNums } = appData
 
-  const savedRole = appData.roleResult
-  const [pairs, setPairsState] = useState<{ student: Student; role: string }[]>(savedRole?.pairs ?? [])
-  const [showPreview, setShowPreviewState] = useState(savedRole?.showPreview ?? false)
-
-  const setPairs = useCallback((p: { student: Student; role: string }[]) => {
-    setPairsState(p)
-  }, [])
-  const setShowPreview = useCallback((v: boolean) => {
-    setShowPreviewState(v)
-    if (v) {
-      setData({ roleResult: { pairs, showPreview: true } })
-    }
-  }, [pairs])
-
   const varCount = variableRoles.length
   const studentByNum = useMemo(() => new Map(allStudents.map(s => [s.num, s])), [allStudents])
   const fixedStudentNums = useMemo(() => new Set(fixedRoles.map(r => r.studentNum).filter(Boolean) as number[]), [fixedRoles])
   const availableStudents = useMemo(() => allStudents.filter(s => !fixedStudentNums.has(s.num)), [allStudents, fixedStudentNums])
   const selectedNums = useMemo(() => new Set(roleSelectedNums.filter(n => !fixedStudentNums.has(n))), [roleSelectedNums, fixedStudentNums])
-
   const canCreate = varCount > 0 && selectedNums.size === varCount
+
+  const savedRole = appData.roleResult
+  const [pairs, setPairs] = useState<{ student: Student; role: string }[]>(savedRole?.pairs ?? [])
+  const [showPreview, setShowPreview] = useState(savedRole?.showPreview ?? false)
+  const [shuffleKey, setShuffleKey] = useState(0) // CardReveal 리마운트용
 
   const descriptions = useMemo(() => {
     const map = new Map<string, string>()
@@ -50,15 +40,40 @@ export default function RoleAssign() {
     }))
   }, [variableRoles, pairs])
 
-  const handleComplete = useCallback(() => {
-    setTimeout(() => setShowPreview(true), 500)
-  }, [setShowPreview])
+  const doShuffle = useCallback(() => {
+    const shuffled = shuffleArray(
+      availableStudents.filter(s => selectedNums.has(s.num))
+    )
+    const newPairs = variableRoles.map((r, i) => ({
+      student: shuffled[i],
+      role: r.name,
+    })).filter(p => p.student)
+    setPairs(newPairs)
+    setData({ roleResult: { pairs: newPairs, showPreview: false } })
+  }, [availableStudents, selectedNums, variableRoles])
 
-  const reset = () => {
-    setPairs([])
-    setShowPreviewState(false)
+  const handleComplete = useCallback(() => {
+    setTimeout(() => {
+      setShowPreview(true)
+      setData({ roleResult: { pairs, showPreview: true } })
+    }, 500)
+  }, [pairs])
+
+  const reset = useCallback(() => {
+    setShowPreview(false)
     setData({ roleResult: null })
-  }
+    // 새로 셔플
+    const shuffled = shuffleArray(
+      availableStudents.filter(s => selectedNums.has(s.num))
+    )
+    const newPairs = variableRoles.map((r, i) => ({
+      student: shuffled[i],
+      role: r.name,
+    })).filter(p => p.student)
+    setPairs(newPairs)
+    setData({ roleResult: { pairs: newPairs, showPreview: false } })
+    setShuffleKey(k => k + 1) // CardReveal 리마운트
+  }, [availableStudents, selectedNums, variableRoles])
 
   const selectedStudents = useMemo(() =>
     availableStudents.filter(s => selectedNums.has(s.num)),
@@ -82,22 +97,10 @@ export default function RoleAssign() {
     })),
   [groupedByRole])
 
-  // 조건 충족 시 1회만 셔플 실행 (reset 후 재마운트 시 다시 실행)
-  // canCreate만 의존: 나머지는 canCreate가 true일 때 안정적
+  // 최초 마운트 시 pairs 없으면 셔플
   useEffect(() => {
-    if (!canCreate || pairs.length > 0) return
-
-    const shuffled = shuffleArray(
-      availableStudents.filter(s => selectedNums.has(s.num))
-    )
-
-    const newPairs = variableRoles.map((r, i) => ({
-      student: shuffled[i],
-      role: r.name,
-    })).filter(p => p.student)
-    setPairs(newPairs)
-    setData({ roleResult: { pairs: newPairs, showPreview: false } })
-  }, [canCreate]) // eslint-disable-line react-hooks/exhaustive-deps
+    if (canCreate && pairs.length === 0) doShuffle()
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!varCount) {
     return (
@@ -119,22 +122,31 @@ export default function RoleAssign() {
 
   return (
     <div>
-      <div className="print:hidden">
-        <CardReveal
-          roles={pairs.map(p => p.role)}
-          students={studentLabels}
-          results={studentLabels}
-          onComplete={handleComplete}
-          onReset={reset}
-          selectedStudents={selectedStudents}
-          fixedRoles={fixedRoles}
-          studentByNum={studentByNum}
-        />
-      </div>
+      {!showPreview && (
+        <div className="print:hidden">
+          <CardReveal
+            key={shuffleKey}
+            roles={pairs.map(p => p.role)}
+            students={studentLabels}
+            results={studentLabels}
+            onComplete={handleComplete}
+            onReset={reset}
+            selectedStudents={selectedStudents}
+            fixedRoles={fixedRoles}
+            studentByNum={studentByNum}
+          />
+        </div>
+      )}
 
       {showPreview && (
-        <div className="mt-8 print:!mt-0">
-          <PrintButton />
+        <div className="print:!mt-0">
+          <div className="flex justify-end gap-2 mb-3 print:hidden">
+            <button onClick={reset}
+              className="btn-action bg-ink/20 !text-ink hover:bg-ink/30">
+              초기화
+            </button>
+            <PrintButton inline />
+          </div>
 
           <div className="page">
             <PageHeader badge="Role" title="우리반 역할 배정 결과" />
