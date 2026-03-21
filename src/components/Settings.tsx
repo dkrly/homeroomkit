@@ -187,8 +187,6 @@ function SeatingTab() {
         <p className="text-xs text-danger mb-2">활성 좌석({active})과 학생 수({students.length})가 다릅니다.</p>
       )}
 
-      {/* 거리두기 */}
-      <DistancingEditor />
     </div>
   )
 }
@@ -364,56 +362,52 @@ function DistancingEditor() {
   const getName = (num: number) => students.find(s => s.num === num)?.name ?? `${num}번`
 
   return (
-    <div className="mt-6 pt-5" style={{ borderTop: '1px solid #E5E7EB', color: 'transparent', userSelect: 'none' }}>
-      <style>{`.distancing-area { color: transparent !important; } .distancing-area *::selection { color: initial; background: #b3d4fc; } .distancing-area:active, .distancing-area *:active { color: initial !important; } .distancing-area select, .distancing-area button { color: transparent !important; } .distancing-area select:focus, .distancing-area button:active { color: initial !important; }`}</style>
-      <div className="distancing-area">
-        <p className="text-sm font-bold mb-1">거리두기</p>
-        <p className="text-xs mb-3" style={{ opacity: 0.4 }}>선택한 두 학생을 자리 셔플 시 인접하지 않게 배정합니다</p>
+    <div className="mt-6 pt-5" style={{ borderTop: '1px solid #E5E7EB' }}>
+      <p className="text-sm font-bold text-ink mb-1">거리두기</p>
+      <p className="text-xs text-ink/40 mb-3">선택한 두 학생을 자리 셔플 시 인접하지 않게 배정합니다</p>
 
-        {distanced.length > 0 && (
-          <div className="flex flex-col gap-1.5 mb-4">
-            {distanced.map(([a, b], i) => (
-              <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-lg"
-                style={{ background: 'transparent', border: '1px solid transparent' }}>
-                <span className="text-sm font-bold">
-                  {a}번 {getName(a)}
-                </span>
-                <span className="text-xs" style={{ opacity: 0.5 }}>↔</span>
-                <span className="text-sm font-bold">
-                  {b}번 {getName(b)}
-                </span>
-                <button onClick={() => removePair(i)}
-                  className="ml-auto text-xs border-none cursor-pointer rounded px-2 py-1"
-                  style={{ background: 'transparent' }}>
-                  삭제
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
+      {distanced.length > 0 && (
+        <div className="flex flex-col gap-1.5 mb-4">
+          {distanced.map(([a, b], i) => (
+            <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: '#FEF2F2', border: '1px solid #FECACA' }}>
+              <span className="text-sm font-bold" style={{ color: '#991B1B' }}>
+                {a}번 {getName(a)}
+              </span>
+              <span className="text-xs" style={{ color: '#991B1B', opacity: 0.5 }}>↔</span>
+              <span className="text-sm font-bold" style={{ color: '#991B1B' }}>
+                {b}번 {getName(b)}
+              </span>
+              <button onClick={() => removePair(i)}
+                className="ml-auto text-xs border-none cursor-pointer rounded px-2 py-1"
+                style={{ background: '#DC2626', color: '#fff' }}>
+                삭제
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
-        {students.length > 0 && (
-          <div className="flex items-center gap-2">
-            <select value={selA ?? ''} onChange={e => setSelA(e.target.value ? Number(e.target.value) : null)}
-              className="px-2 py-1.5 rounded border text-sm" style={{ borderColor: 'transparent', background: 'transparent' }}>
-              <option value="">학생 1</option>
-              {students.map(s => <option key={s.num} value={s.num}>{s.num} {s.name}</option>)}
-            </select>
-            <span className="font-bold">↔</span>
-            <select value={selB ?? ''} onChange={e => setSelB(e.target.value ? Number(e.target.value) : null)}
-              className="px-2 py-1.5 rounded border text-sm" style={{ borderColor: 'transparent', background: 'transparent' }}>
-              <option value="">학생 2</option>
-              {students.filter(s => s.num !== selA).map(s => <option key={s.num} value={s.num}>{s.num} {s.name}</option>)}
-            </select>
-            <button onClick={addPair}
-              disabled={selA === null || selB === null || selA === selB}
-              className="px-3 py-1.5 rounded-lg text-sm font-bold border-none cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
-              style={{ background: 'transparent' }}>
-              추가
-            </button>
-          </div>
-        )}
-      </div>
+      {students.length > 0 && (
+        <div className="flex items-center gap-2">
+          <select value={selA ?? ''} onChange={e => setSelA(e.target.value ? Number(e.target.value) : null)}
+            className="px-2 py-1.5 rounded border border-border text-sm">
+            <option value="">학생 1</option>
+            {students.map(s => <option key={s.num} value={s.num}>{s.num} {s.name}</option>)}
+          </select>
+          <span className="text-ink/30 font-bold">↔</span>
+          <select value={selB ?? ''} onChange={e => setSelB(e.target.value ? Number(e.target.value) : null)}
+            className="px-2 py-1.5 rounded border border-border text-sm">
+            <option value="">학생 2</option>
+            {students.filter(s => s.num !== selA).map(s => <option key={s.num} value={s.num}>{s.num} {s.name}</option>)}
+          </select>
+          <button onClick={addPair}
+            disabled={selA === null || selB === null || selA === selB}
+            className="px-3 py-1.5 rounded-lg text-sm font-bold border-none cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+            style={{ background: '#1E2A1E', color: '#F6F7F2' }}>
+            추가
+          </button>
+        </div>
+      )}
     </div>
   )
 }
