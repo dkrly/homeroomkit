@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { getStudentColor } from '../utils/colors'
 import { useShuffleReveal } from '../utils/useShuffleReveal'
-import type { Student, FixedRole } from '../store'
+import type { Student } from '../store'
 
 const MAX_COLS = 5
 const REVEAL_INTERVAL = 350
@@ -14,11 +14,9 @@ interface CardRevealProps {
   onComplete: () => void
   onReset: () => void
   selectedStudents?: Student[]
-  fixedRoles?: FixedRole[]
-  studentByNum?: Map<number, Student>
 }
 
-export default function CardReveal({ roles, students, results, onComplete, onReset, selectedStudents, fixedRoles, studentByNum }: CardRevealProps) {
+export default function CardReveal({ roles, students, results, onComplete, onReset, selectedStudents }: CardRevealProps) {
   const { phase, stoppedUpTo, startSpin, stopSpin, reset } = useShuffleReveal({
     itemCount: roles.length,
     revealInterval: REVEAL_INTERVAL,
@@ -105,7 +103,7 @@ export default function CardReveal({ roles, students, results, onComplete, onRes
                 className="font-black mb-2 transition-colors duration-300 text-center whitespace-nowrap"
                 style={{
                   color: stopped ? sc.fg : 'rgba(255,255,255,0.9)',
-                  fontSize: role.length > 8 ? '11px' : role.length > 6 ? '12px' : '14px',
+                  fontSize: role.length > 10 ? '11px' : role.length > 7 ? '13px' : '15px',
                 }}
               >
                 {role}

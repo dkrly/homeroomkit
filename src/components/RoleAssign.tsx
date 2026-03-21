@@ -130,8 +130,6 @@ export default function RoleAssign() {
             onComplete={handleComplete}
             onReset={reset}
             selectedStudents={selectedStudents}
-            fixedRoles={fixedRoles}
-            studentByNum={studentByNum}
           />
         </div>
       )}
