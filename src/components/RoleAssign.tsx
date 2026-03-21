@@ -56,25 +56,17 @@ export default function RoleAssign() {
     [pairs]
   )
 
-  const page1Rows = useMemo(() => [
-    ...fixedRoles.map((r, i) => {
-      const s = r.studentNum ? studentByNum.get(r.studentNum) : null
-      return { key: `f${i}`, left: s ? fmtStudent(s) : '미정', right: r.name, desc: r.description, idx: i }
-    }),
-    ...pairs.map((p, i) => ({
-      key: `v${i}`, left: fmtStudent(p.student), right: p.role, desc: descriptions.get(p.role) || '', idx: fixedRoles.length + i,
+  const page1Rows = useMemo(() =>
+    pairs.map((p, i) => ({
+      key: `v${i}`, left: fmtStudent(p.student), right: p.role, desc: descriptions.get(p.role) || '', idx: i,
     })),
-  ], [fixedRoles, pairs, studentByNum, descriptions])
+  [pairs, descriptions])
 
-  const page2Rows = useMemo(() => [
-    ...fixedRoles.map((r, i) => {
-      const s = r.studentNum ? studentByNum.get(r.studentNum) : null
-      return { key: `f${i}`, left: r.name, right: s ? fmtStudent(s) : '미정', idx: i }
-    }),
-    ...groupedByRole.map(({ role, students }, i) => ({
-      key: `r${i}`, left: role, right: students.map(fmtStudent).join(', '), idx: fixedRoles.length + i,
+  const page2Rows = useMemo(() =>
+    groupedByRole.map(({ role, students }, i) => ({
+      key: `r${i}`, left: role, right: students.map(fmtStudent).join(', '), idx: i,
     })),
-  ], [fixedRoles, groupedByRole, studentByNum])
+  [groupedByRole])
 
   // 조건 충족 시 1회만 셔플 실행 (reset 후 재마운트 시 다시 실행)
   // canCreate만 의존: 나머지는 canCreate가 true일 때 안정적
