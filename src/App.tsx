@@ -97,7 +97,6 @@ export default function App() {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [zoom, setZoom] = useState(loadZoom)
   const [settingsAuthed, setSettingsAuthed] = useState(false)
-  const [settingsPending, setSettingsPending] = useState(false)
   const [settingsPw, setSettingsPw] = useState('')
   const [settingsErr, setSettingsErr] = useState('')
   const tapCount = useRef(0)
@@ -109,13 +108,8 @@ export default function App() {
     clearTimeout(tapTimer.current)
     if (tapCount.current >= 5) {
       tapCount.current = 0
-      if (settingsAuthed) {
-        setTab('settings')
-        setDrawerOpen(false)
-      } else {
-        setSettingsPending(true)
-        setDrawerOpen(false)
-      }
+      setTab('settings')
+      setDrawerOpen(false)
     } else {
       tapTimer.current = setTimeout(() => { tapCount.current = 0 }, 1500)
     }
@@ -126,9 +120,7 @@ export default function App() {
     const hash = await hashPassword(settingsPw)
     if (hash === __PASSWORD_HASH__) {
       setSettingsAuthed(true)
-      setSettingsPending(false)
       setSettingsPw('')
-      setTab('settings')
     } else {
       setSettingsErr('비밀번호가 틀렸습니다')
     }
@@ -256,7 +248,7 @@ export default function App() {
 
       {/* 메인 콘텐츠 */}
       <main className="print-reset flex-1 flex justify-center items-start overflow-auto p-8 pt-16">
-        {(settingsPending || tab === 'settings') && !settingsAuthed ? (
+        {tab === 'settings' && !settingsAuthed ? (
           <div className="flex items-center justify-center py-20">
             <div className="rounded-2xl p-8 w-80" style={{ background: '#fff', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
               <h2 className="text-lg font-bold mb-1" style={{ color: '#1E2A1E' }}>설정</h2>
@@ -278,7 +270,7 @@ export default function App() {
                     style={{ background: '#1E2A1E', color: '#F6F7F2' }}>
                     확인
                   </button>
-                  <button type="button" onClick={() => { setSettingsPending(false); setSettingsPw(''); setSettingsErr('') }}
+                  <button type="button" onClick={() => { setTab('timetable'); setSettingsPw(''); setSettingsErr('') }}
                     className="px-4 py-2 rounded-lg text-sm border-none cursor-pointer"
                     style={{ background: '#eee', color: '#666' }}>
                     취소
