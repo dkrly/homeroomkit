@@ -61,8 +61,6 @@ export default function RoleAssign() {
 
   const reset = useCallback(() => {
     setShowPreview(false)
-    setData({ roleResult: null })
-    // 새로 셔플
     const shuffled = shuffleArray(
       availableStudents.filter(s => selectedNums.has(s.num))
     )
@@ -72,7 +70,7 @@ export default function RoleAssign() {
     })).filter(p => p.student)
     setPairs(newPairs)
     setData({ roleResult: { pairs: newPairs, showPreview: false } })
-    setShuffleKey(k => k + 1) // CardReveal 리마운트
+    setShuffleKey(k => k + 1)
   }, [availableStudents, selectedNums, variableRoles])
 
   const selectedStudents = useMemo(() =>

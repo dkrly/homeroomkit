@@ -3,6 +3,7 @@ import PageHeader from './PageHeader'
 import PrintButton from './PrintButton'
 import { useAppData } from '../store'
 import type { BingoQuestion } from '../store'
+import { shuffleArray } from '../utils/shuffle'
 
 interface BingoItem {
   emoji: string
@@ -10,21 +11,12 @@ interface BingoItem {
   required?: boolean
 }
 
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr]
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[a[i], a[j]] = [a[j], a[i]]
-  }
-  return a
-}
-
 const TOTAL = 12
 
 function pick(questions: BingoQuestion[]): BingoItem[] {
   const required = questions.filter(q => q.required).map(q => ({ ...q, required: true }))
-  const rest = shuffle(questions.filter(q => !q.required)).slice(0, TOTAL - required.length)
-  return shuffle([...required, ...rest])
+  const rest = shuffleArray(questions.filter(q => !q.required)).slice(0, TOTAL - required.length)
+  return shuffleArray([...required, ...rest])
 }
 
 const COLS = 4

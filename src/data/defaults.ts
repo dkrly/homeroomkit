@@ -1,7 +1,5 @@
 import type { FixedRole, VariableRole, SeatingConfig, BingoQuestion } from '../store'
 
-export const CLASS_NAME = '1학년 2반'
-
 export const defaultFixedRoles: FixedRole[] = [
   { name: '회장', description: '즐겁고 평화로운 학급 분위기 조성/ 학급회의 주도하기/ 담임선생님 도와주기/일정 칠판에 안내/ 유인물 관리 등' },
   { name: '부회장', description: '즐겁고 평화로운 학급 분위기 조성/ 학급회의 주도하기/ 담임선생님 도와주기/일정 칠판에 안내/ 유인물 관리 등' },
