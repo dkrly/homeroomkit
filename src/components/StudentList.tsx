@@ -33,7 +33,7 @@ function Column({ students, rows }: { students: { num: number; name: string }[];
             style={{ background: sc.bg }}
           >
             <div className="absolute left-0 top-[15%] bottom-[15%] w-[5px] rounded-r-sm" style={{ background: sc.bar }} />
-            <div className="text-[28px] font-black w-12" style={{ color: `${sc.fg}99` }}>{s.num}</div>
+            <div className="text-[28px] font-black w-12" style={{ color: `${sc.fg}DD` }}>{s.num}</div>
             <div className="text-[28px] font-black" style={{ color: sc.fg }}>{s.name}</div>
           </div>
         )

@@ -27,7 +27,7 @@ export function TimetableContent({ days, grid, getColor }: Omit<TimetableGridPro
             <Cell key={d} label={label} color={getColor(label)} />
           ) : (
             <div key={d} className="grid place-items-center rounded-lg bg-empty">
-              <div className="w-1.5 h-1.5 rounded-full bg-border" />
+              <div className="w-2 h-2 rounded-full bg-border" />
             </div>
           ))}
         </div>

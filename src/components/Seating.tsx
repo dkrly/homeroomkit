@@ -209,7 +209,7 @@ export default function Seating() {
                 <div key={idx} onClick={() => toggleSeat(idx)}
                   className="rounded-[10px] bg-empty flex items-center justify-center transition-colors"
                   style={{ cursor: isSetup ? 'pointer' : 'default' }}>
-                  <div className="w-1.5 h-1.5 rounded-full bg-border" />
+                  <div className="w-2 h-2 rounded-full bg-border" />
                 </div>
               )
             }
@@ -262,7 +262,7 @@ export default function Seating() {
                   <RollingName students={students} offset={idx} />
                 ) : (
                   <div className={`text-center ${textClass}`}>
-                    <div className="text-[28px] font-black leading-none" style={{ color: fgColor ? `${fgColor}BB` : undefined }}>{numText}</div>
+                    <div className="text-[28px] font-black leading-none" style={{ color: fgColor ? `${fgColor}DD` : undefined }}>{numText}</div>
                     <div className="text-[32px] font-black leading-none tracking-tight" style={{ color: fgColor }}>{nameText ?? '\u00A0'}</div>
                   </div>
                 )}
@@ -293,7 +293,7 @@ export default function Seating() {
                 if (isDisabled) {
                   return (
                     <div key={i} className="rounded-[10px] bg-empty flex items-center justify-center">
-                      <div className="w-1.5 h-1.5 rounded-full bg-border" />
+                      <div className="w-2 h-2 rounded-full bg-border" />
                     </div>
                   )
                 }

@@ -150,7 +150,7 @@ export default function RoleAssign() {
                     <div className="text-3xl font-black whitespace-nowrap" style={{ color: sc.fg }}>{r.left}</div>
                     <div className="ml-auto text-right shrink-0">
                       <div className="text-2xl font-extrabold" style={{ color: `${sc.fg}CC` }}>{r.right}</div>
-                      {r.desc && <div className="text-[10px] leading-tight whitespace-nowrap" style={{ color: `${sc.fg}66` }}>{r.desc}</div>}
+                      {r.desc && <div className="text-[12px] leading-tight whitespace-nowrap" style={{ color: `${sc.fg}99` }}>{r.desc}</div>}
                     </div>
                   </div>
                 )
