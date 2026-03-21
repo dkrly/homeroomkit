@@ -76,6 +76,7 @@ export default function App() {
   const [tab, setTabState] = useState<TabId>(getTabFromHash)
   const setTab = useCallback((id: TabId) => {
     setTabState(id)
+    if (id === 'settings') return // settings는 hash에 노출하지 않음
     window.location.hash = id === 'timetable' ? '' : id
   }, [])
 
