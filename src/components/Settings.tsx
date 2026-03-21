@@ -187,7 +187,7 @@ function SeatingTab() {
         <p className="text-xs text-danger mb-2">활성 좌석({active})과 학생 수({students.length})가 다릅니다.</p>
       )}
 
-      <DistancingEditor />
+      <AdvancedOptions />
     </div>
   )
 }
@@ -338,6 +338,27 @@ function BingoTab() {
 }
 
 // --- 초기화 ---
+
+// --- 추가 옵션 ---
+
+function AdvancedOptions() {
+  const [open, setOpen] = useState(false)
+  const { seating } = useAppData()
+  const distanced = seating.distanced || []
+
+  return (
+    <div className="mt-5">
+      <button onClick={() => setOpen(!open)}
+        className="flex items-center gap-1.5 text-sm font-bold border-none cursor-pointer bg-transparent"
+        style={{ color: '#1E2A1E', opacity: 0.5 }}>
+        <span style={{ display: 'inline-block', transition: 'transform .2s', transform: open ? 'rotate(90deg)' : '' }}>▶</span>
+        추가 옵션
+        {distanced.length > 0 && <span className="text-[10px] opacity-60">({distanced.length})</span>}
+      </button>
+      {open && <DistancingEditor />}
+    </div>
+  )
+}
 
 // --- 거리두기 ---
 
