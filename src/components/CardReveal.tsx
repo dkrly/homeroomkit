@@ -3,7 +3,7 @@ import { getStudentColor } from '../utils/colors'
 import { useShuffleReveal } from '../utils/useShuffleReveal'
 import type { Student, FixedRole } from '../store'
 
-const MAX_COLS = 6
+const MAX_COLS = 5
 const REVEAL_INTERVAL = 350
 const ROLLING_INTERVAL = 60
 
