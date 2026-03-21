@@ -9,10 +9,23 @@ import CardReveal from './CardReveal'
 const rowBg = (i: number) => i % 2 === 0 ? '#EAEDE2' : '#E4E8E0'
 const fmtStudent = (s: Student) => `${s.num}번 ${s.name}`
 
+// 탭 이동 시 결과 유지용 캐시
+let cachedPairs: { student: Student; role: string }[] | null = null
+let cachedShowPreview = false
+
 export default function RoleAssign() {
   const { students: allStudents, fixedRoles, variableRoles, roleSelectedNums } = useAppData()
-  const [pairs, setPairs] = useState<{ student: Student; role: string }[]>([])
-  const [showPreview, setShowPreview] = useState(false)
+  const [pairs, setPairsState] = useState<{ student: Student; role: string }[]>(cachedPairs ?? [])
+  const [showPreview, setShowPreviewState] = useState(cachedShowPreview)
+
+  const setPairs = useCallback((p: { student: Student; role: string }[]) => {
+    cachedPairs = p
+    setPairsState(p)
+  }, [])
+  const setShowPreview = useCallback((v: boolean) => {
+    cachedShowPreview = v
+    setShowPreviewState(v)
+  }, [])
 
   const varCount = variableRoles.length
   const studentByNum = useMemo(() => new Map(allStudents.map(s => [s.num, s])), [allStudents])
@@ -39,9 +52,11 @@ export default function RoleAssign() {
 
   const handleComplete = useCallback(() => {
     setTimeout(() => setShowPreview(true), 500)
-  }, [])
+  }, [setShowPreview])
 
   const reset = () => {
+    cachedPairs = null
+    cachedShowPreview = false
     setPairs([])
     setShowPreview(false)
   }

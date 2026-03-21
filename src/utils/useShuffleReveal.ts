@@ -7,11 +7,13 @@ interface ShuffleRevealOptions {
   itemCount: number
   revealInterval?: number
   onAllRevealed?: () => void
+  initialPhase?: Phase
+  initialStoppedUpTo?: number
 }
 
-export function useShuffleReveal({ itemCount, revealInterval = 200, onAllRevealed }: ShuffleRevealOptions) {
-  const [phase, setPhase] = useState<Phase>('ready')
-  const [stoppedUpTo, setStoppedUpTo] = useState(-1)
+export function useShuffleReveal({ itemCount, revealInterval = 200, onAllRevealed, initialPhase = 'ready', initialStoppedUpTo = -1 }: ShuffleRevealOptions) {
+  const [phase, setPhase] = useState<Phase>(initialPhase)
+  const [stoppedUpTo, setStoppedUpTo] = useState(initialStoppedUpTo)
   const timerRef = useRef<number>(0)
   const stopLoopRef = useRef<(() => void) | null>(null)
 
