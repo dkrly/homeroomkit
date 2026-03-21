@@ -1,5 +1,4 @@
 import { days, grid, subjectColors } from '../data/timetable'
-import { CLASS_NAME } from '../data/defaults'
 import { TimetableContent } from './Timetable'
 import { ScheduleContent } from './Schedule'
 import PageHeader from './PageHeader'
