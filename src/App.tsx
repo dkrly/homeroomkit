@@ -152,14 +152,29 @@ export default function App() {
     <>
     <style>{pageStyle(tab)}</style>
     <div className="print-reset flex h-screen relative">
-      {/* 햄버거 버튼 */}
-      <button onClick={() => setDrawerOpen(true)}
-        className="fixed top-4 left-4 z-40 w-11 h-11 rounded-2xl bg-ink/90 text-bg flex items-center justify-center border-none cursor-pointer print:hidden backdrop-blur-sm"
-        style={{ display: drawerOpen ? 'none' : 'flex', boxShadow: '0 2px 12px rgba(30,42,30,0.15)' }}>
-        <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
-          <path d="M1 1h16M1 7h16M1 13h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-        </svg>
-      </button>
+      {/* 상단 바: 햄버거 + 줌 */}
+      <div className="fixed top-4 left-4 z-40 flex items-center gap-2 print:hidden"
+        style={{ display: drawerOpen ? 'none' : 'flex' }}>
+        <button onClick={() => setDrawerOpen(true)}
+          className="w-11 h-11 rounded-2xl bg-ink/90 text-bg flex items-center justify-center border-none cursor-pointer backdrop-blur-sm"
+          style={{ boxShadow: '0 2px 12px rgba(30,42,30,0.15)' }}>
+          <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+            <path d="M1 1h16M1 7h16M1 13h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+        </button>
+        <div className="flex items-center gap-1 h-11 rounded-2xl px-2 bg-ink/90 backdrop-blur-sm"
+          style={{ boxShadow: '0 2px 12px rgba(30,42,30,0.15)' }}>
+          <button onClick={() => changeZoom(-ZOOM_STEP)}
+            className="w-7 h-7 rounded-lg bg-bg/10 text-bg/60 hover:bg-bg/20 hover:text-bg border-none cursor-pointer text-sm font-bold">
+            −
+          </button>
+          <span className="text-[10px] text-bg/50 font-mono w-8 text-center">{Math.round(zoom * 100)}</span>
+          <button onClick={() => changeZoom(ZOOM_STEP)}
+            className="w-7 h-7 rounded-lg bg-bg/10 text-bg/60 hover:bg-bg/20 hover:text-bg border-none cursor-pointer text-sm font-bold">
+            +
+          </button>
+        </div>
+      </div>
 
       {/* 오버레이 */}
       <div className={`fixed inset-0 z-40 print:hidden transition-colors duration-200
@@ -232,22 +247,9 @@ export default function App() {
         </div>
 
         {/* 하단 */}
-        <div className="px-6 py-5 shrink-0" style={{ borderTop: '1px solid rgba(246,247,242,0.08)' }}>
-          <div className="flex items-center gap-1.5 mb-3">
-            <button onClick={() => changeZoom(-ZOOM_STEP)}
-              className="w-9 h-9 rounded-xl bg-bg/8 text-bg/50 hover:bg-bg/15 hover:text-bg border-none cursor-pointer text-sm font-bold transition-colors">
-              −
-            </button>
-            <div className="flex-1 text-center">
-              <span className="text-xs text-bg/40 font-mono">{Math.round(zoom * 100)}%</span>
-            </div>
-            <button onClick={() => changeZoom(ZOOM_STEP)}
-              className="w-9 h-9 rounded-xl bg-bg/8 text-bg/50 hover:bg-bg/15 hover:text-bg border-none cursor-pointer text-sm font-bold transition-colors">
-              +
-            </button>
-          </div>
+        <div className="px-6 py-4 shrink-0 text-center" style={{ borderTop: '1px solid rgba(246,247,242,0.08)' }}>
           <span onClick={handleVersionTap}
-            className="text-[10px] text-bg/20 cursor-default select-none block">
+            className="text-[10px] text-bg/20 cursor-default select-none">
             {__BUILD_VERSION__}
           </span>
         </div>
