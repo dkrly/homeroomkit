@@ -149,10 +149,10 @@ export default function RoleAssign() {
             <div className="flex-1 grid gap-[2px] min-h-0" style={{ gridTemplateRows: `repeat(${page1Rows.length}, minmax(0, 1fr))` }}>
               {page1Rows.map(r => (
                 <div key={r.key} className="flex items-center rounded-xl overflow-hidden px-5 min-h-0" style={{ background: rowBg(r.idx) }}>
-                  <div className="text-lg font-black text-ink whitespace-nowrap">{r.left}</div>
+                  <div className="text-3xl font-black text-ink whitespace-nowrap">{r.left}</div>
                   <div className="ml-auto text-right shrink-0">
-                    <div className="text-lg font-extrabold text-ink/80">{r.right}</div>
-                    {r.desc && <div className="text-[9px] text-ink/40 leading-tight whitespace-nowrap">{r.desc}</div>}
+                    <div className="text-2xl font-extrabold text-ink/80">{r.right}</div>
+                    {r.desc && <div className="text-[10px] text-ink/40 leading-tight whitespace-nowrap">{r.desc}</div>}
                   </div>
                 </div>
               ))}
@@ -164,8 +164,8 @@ export default function RoleAssign() {
             <div className="flex-1 grid gap-[2px] min-h-0" style={{ gridTemplateRows: `repeat(${page2Rows.length}, minmax(0, 1fr))` }}>
               {page2Rows.map(r => (
                 <div key={r.key} className="flex items-center rounded-xl overflow-hidden px-5 min-h-0" style={{ background: rowBg(r.idx) }}>
-                  <div className="text-lg font-black text-ink whitespace-nowrap">{r.left}</div>
-                  <div className="text-lg font-extrabold text-ink/70 ml-auto text-right">{r.right}</div>
+                  <div className="text-3xl font-black text-ink whitespace-nowrap">{r.left}</div>
+                  <div className="text-2xl font-extrabold text-ink/70 ml-auto text-right">{r.right}</div>
                 </div>
               ))}
             </div>
