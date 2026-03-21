@@ -20,9 +20,9 @@ interface NavGroup {
 }
 
 const navGroups: NavGroup[] = [
-  { icon: '👥', label: '학생', items: [{ id: 'students', label: '학생' }] },
   { icon: '🧑‍🏫', label: '정보 시간표', items: [{ id: 'teacher', label: '정보 시간표' }] },
   { icon: '🏫', label: '우리반', items: [
+    { id: 'students', label: '학생' },
     { id: 'timetable', label: '시간표' },
     { id: 'schedule', label: '일과운영표' },
     { id: 'combo', label: '시간+일과' },
