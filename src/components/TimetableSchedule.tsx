@@ -15,7 +15,7 @@ export default function TimetableSchedule() {
       <div className="flex flex-1 min-h-0">
         {/* 왼쪽: 시간표 */}
         <div className="flex-1 flex flex-col min-w-0" style={{ zoom: PANEL_ZOOM }}>
-          <PageHeader badge="Class" title={`${CLASS_NAME} 시간표`} />
+          <PageHeader badge="Class" title="우리반 시간표" />
           <TimetableContent days={days} grid={grid} getColor={getColor} />
         </div>
 

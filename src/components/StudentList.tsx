@@ -10,7 +10,7 @@ export default function StudentList() {
 
   return (
     <div className="page">
-      <PageHeader badge="Students" title="학생 명단" />
+      <PageHeader badge="Students" title="우리반 학생" />
       <div className="flex gap-[3px] flex-1 min-h-0">
         <Column students={left} rows={rowCount} />
         <Column students={right} rows={rowCount} />
