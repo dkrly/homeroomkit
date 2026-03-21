@@ -63,19 +63,6 @@ export default function CardReveal({ roles, students, results, onComplete, onRes
         </button>
       </div>
 
-      {fixedRoles && fixedRoles.length > 0 && studentByNum && (
-        <div className="flex flex-wrap gap-1.5 mb-4">
-          {fixedRoles.map((r, i) => {
-            const s = r.studentNum ? studentByNum.get(r.studentNum) : null
-            return (
-              <span key={`f${i}`} className="px-3 py-1.5 rounded-lg text-sm font-bold bg-ink/10 text-ink/70">
-                {r.name}{s ? ` → ${s.num} ${s.name}` : ''}
-              </span>
-            )
-          })}
-        </div>
-      )}
-
       {selectedStudents && selectedStudents.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-4">
           {selectedStudents.map(s => {
