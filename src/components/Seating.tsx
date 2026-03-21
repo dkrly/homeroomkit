@@ -126,34 +126,11 @@ export default function Seating() {
 
   const isSetup = phase === 'ready'
   const canStart = isSetup && activeIndices.length === students.length
-  const [optionsOpen, setOptionsOpen] = useState(false)
-
-  const distanced = seating.distanced || []
-  const [selA, setSelA] = useState<number | null>(null)
-  const [selB, setSelB] = useState<number | null>(null)
-
-  const addPair = () => {
-    if (selA === null || selB === null || selA === selB) return
-    const pair: [number, number] = selA < selB ? [selA, selB] : [selB, selA]
-    if (distanced.some(([a, b]) => a === pair[0] && b === pair[1])) return
-    setData({ seating: { ...seating, distanced: [...distanced, pair] } })
-    setSelA(null)
-    setSelB(null)
-  }
-
-  const removePair = (idx: number) => {
-    setData({ seating: { ...seating, distanced: distanced.filter((_, i) => i !== idx) } })
-  }
 
   return (
     <div>
       {/* 컨트롤 */}
       <div className="flex items-center gap-2 mb-3 print:hidden">
-        <button onClick={() => setOptionsOpen(!optionsOpen)}
-          className={`btn-action ${optionsOpen ? 'bg-ink !text-bg' : 'bg-ink/10 !text-ink/60 hover:bg-ink/20'}`}>
-          {optionsOpen ? '옵션 ▴' : '옵션 ▾'}
-          {distanced.length > 0 && <span className="ml-1 text-[10px] opacity-60">({distanced.length})</span>}
-        </button>
         <div className="flex gap-2 ml-auto">
           <button onClick={assignByOrder} disabled={!canStart}
             className={`btn-action ${!canStart ? 'bg-ink/30 cursor-not-allowed' : 'bg-ink/20 !text-ink hover:bg-ink/30'}`}>
@@ -174,49 +151,6 @@ export default function Seating() {
           <PrintButton disabled={phase !== 'done'} inline />
         </div>
       </div>
-
-      {/* 추가 옵션 패널 */}
-      {optionsOpen && (
-        <div className="mb-3 p-4 rounded-xl print:hidden" style={{ background: '#fff', border: '1px solid #E5E7EB' }}>
-          <p className="text-xs font-bold text-ink/60 mb-2">거리두기 — 인접 배치 금지</p>
-          {distanced.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mb-3">
-              {distanced.map(([a, b], i) => {
-                const nameA = students.find(s => s.num === a)?.name ?? a
-                const nameB = students.find(s => s.num === b)?.name ?? b
-                return (
-                  <span key={i} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold"
-                    style={{ background: '#FEF2F2', color: '#991B1B' }}>
-                    {nameA} ↔ {nameB}
-                    <button onClick={() => removePair(i)}
-                      className="ml-0.5 w-4 h-4 rounded-full border-none cursor-pointer text-[10px] leading-none"
-                      style={{ background: '#DC2626', color: '#fff' }}>×</button>
-                  </span>
-                )
-              })}
-            </div>
-          )}
-          <div className="flex items-center gap-2">
-            <select value={selA ?? ''} onChange={e => setSelA(e.target.value ? Number(e.target.value) : null)}
-              className="px-2 py-1.5 rounded border border-border text-xs">
-              <option value="">학생 1</option>
-              {students.map(s => <option key={s.num} value={s.num}>{s.num} {s.name}</option>)}
-            </select>
-            <span className="text-ink/30 text-xs font-bold">↔</span>
-            <select value={selB ?? ''} onChange={e => setSelB(e.target.value ? Number(e.target.value) : null)}
-              className="px-2 py-1.5 rounded border border-border text-xs">
-              <option value="">학생 2</option>
-              {students.filter(s => s.num !== selA).map(s => <option key={s.num} value={s.num}>{s.num} {s.name}</option>)}
-            </select>
-            <button onClick={addPair}
-              disabled={selA === null || selB === null || selA === selB}
-              className="px-3 py-1.5 rounded-lg text-xs font-bold border-none cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
-              style={{ background: '#1E2A1E', color: '#F6F7F2' }}>
-              추가
-            </button>
-          </div>
-        </div>
-      )}
 
       <div className="page h-[calc(100vh-7rem)] print:!h-[1123px]">
         <PageHeader badge="Seat" title="자리 배치표"
