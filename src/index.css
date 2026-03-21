@@ -72,6 +72,47 @@
   transition: background-color 0.15s;
 }
 
+#pwa-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  border-radius: 14px;
+  background: var(--color-ink);
+  color: var(--color-bg);
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+  animation: toast-in 0.3s ease-out;
+}
+#pwa-update {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: none;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+#pwa-dismiss {
+  padding: 4px 8px;
+  border: none;
+  background: transparent;
+  color: var(--color-bg);
+  opacity: 0.5;
+  font-size: 14px;
+  cursor: pointer;
+}
+@keyframes toast-in {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
 @media print {
   html, body {
     margin: 0;
