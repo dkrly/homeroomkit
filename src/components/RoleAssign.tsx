@@ -137,7 +137,7 @@ export default function RoleAssign() {
           <PrintButton />
 
           <div className="page">
-            <PageHeader badge="Role" title="1인 1역 배정 결과" />
+            <PageHeader badge="Role" title="우리반 역할 배정 결과" />
             <div className="flex-1 grid gap-[2px] min-h-0" style={{ gridTemplateRows: `repeat(${page1Rows.length}, minmax(0, 1fr))` }}>
               {page1Rows.map(r => (
                 <div key={r.key} className="flex items-center rounded-xl overflow-hidden px-5 min-h-0" style={{ background: rowBg(r.idx) }}>
@@ -152,7 +152,7 @@ export default function RoleAssign() {
           </div>
 
           <div className="page mt-8">
-            <PageHeader badge="Role" title="1인 1역 — 역할별 번호" />
+            <PageHeader badge="Role" title="우리반 역할 — 역할별 번호" />
             <div className="flex-1 grid gap-[2px] min-h-0" style={{ gridTemplateRows: `repeat(${page2Rows.length}, minmax(0, 1fr))` }}>
               {page2Rows.map(r => (
                 <div key={r.key} className="flex items-center rounded-xl overflow-hidden px-5 min-h-0" style={{ background: rowBg(r.idx) }}>

@@ -5,15 +5,13 @@ import RoleAssign from './components/RoleAssign'
 import TeacherTimetable from './components/TeacherTimetable'
 import StudentList from './components/StudentList'
 import Seating from './components/Seating'
-import SeatingSemester1 from './components/SeatingSemester1'
-import RoleSemester1 from './components/RoleSemester1'
 import FriendBingo from './components/FriendBingo'
 import Settings from './components/Settings'
 import TimetableSchedule from './components/TimetableSchedule'
 import PrintButton from './components/PrintButton'
 import AssignmentTool from './components/AssignmentTool'
 import { hashPassword } from './utils/crypto'
-type TabId = 'students' | 'timetable' | 'teacher' | 'schedule' | 'combo' | 'role' | 'role1' | 'seating' | 'seating1' | 'bingo' | 'assignment' | 'settings'
+type TabId = 'students' | 'timetable' | 'teacher' | 'schedule' | 'combo' | 'role' | 'seating' | 'bingo' | 'assignment' | 'settings'
 
 interface NavGroup {
   icon: string
@@ -29,16 +27,12 @@ const navGroups: NavGroup[] = [
     { id: 'schedule', label: '일과운영표' },
     { id: 'combo', label: '시간+일과' },
   ]},
-  { icon: '🎲', label: '역할', items: [
-    { id: 'role', label: '1인1역' },
-    { id: 'role1', label: '우리반 역할' },
+  { icon: '🎲', label: '우리반 역할', items: [{ id: 'role', label: '우리반 역할' }] },
+  { icon: '💺', label: '우리반 자리', items: [{ id: 'seating', label: '우리반 자리' }] },
+  { icon: '🛠️', label: '도구', items: [
+    { id: 'bingo', label: '친구탐험' },
+    { id: 'assignment', label: '주제선택 배정' },
   ]},
-  { icon: '💺', label: '자리', items: [
-    { id: 'seating', label: '자리배치' },
-    { id: 'seating1', label: '우리반 자리' },
-  ]},
-  { icon: '🔍', label: '친구탐험', items: [{ id: 'bingo', label: '친구탐험' }] },
-  { icon: '📊', label: '배정', items: [{ id: 'assignment', label: '주제선택 배정' }] },
 ]
 
 const pages: Record<TabId, React.FC> = {
@@ -47,16 +41,14 @@ const pages: Record<TabId, React.FC> = {
   teacher: TeacherTimetable,
   schedule: Schedule,
   role: RoleAssign,
-  role1: RoleSemester1,
   seating: Seating,
-  seating1: SeatingSemester1,
   bingo: FriendBingo,
   combo: TimetableSchedule,
   assignment: AssignmentTool,
   settings: Settings,
 }
 
-const noPrintButton = new Set<TabId>(['role', 'role1', 'seating', 'seating1', 'bingo', 'assignment', 'settings'])
+const noPrintButton = new Set<TabId>(['role', 'seating', 'bingo', 'assignment', 'settings'])
 
 const ZOOM_STEP = 0.1
 const ZOOM_MIN = 0.5

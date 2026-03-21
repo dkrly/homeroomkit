@@ -181,7 +181,7 @@ export default function Seating() {
       </div>
 
       <div className="page h-[calc(100vh-7rem)] print:!h-[1123px]">
-        <PageHeader badge="Seat" title="자리 배치표"
+        <PageHeader badge="Seat" title="우리반 자리"
           extra={activeIndices.length !== students.length
             ? <span className="text-xs text-danger print:hidden">좌석 {activeIndices.length} ≠ 학생 {students.length}명</span>
             : undefined}
@@ -273,7 +273,7 @@ export default function Seating() {
       {phase === 'done' && (
         <div className="hidden print:block">
           <div className="page">
-            <PageHeader badge="Seat" title="자리 배치표" />
+            <PageHeader badge="Seat" title="우리반 자리" />
             <div className="grid gap-[3px] flex-1" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
               {Array.from({ length: totalSeats }, (_, i) => {
                 const r = Math.floor(i / cols)
