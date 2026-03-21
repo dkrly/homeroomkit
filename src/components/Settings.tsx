@@ -198,11 +198,13 @@ function RolesTab() {
   const [fixedData, setFixedData] = useState<Row[]>(fixedToMatrix(fixedRoles))
   const [varData, setVarData] = useState<Row[]>(varToMatrix(variableRoles))
 
-  const selectedNums = useMemo(() => new Set(roleSelectedNums), [roleSelectedNums])
   const validFixed = useMemo(() => matrixToFixed(fixedData), [fixedData])
   const validVar = useMemo(() => matrixToVar(varData), [varData])
   const fixedStudentNums = useMemo(() => new Set(validFixed.map(r => r.studentNum).filter(Boolean) as number[]), [validFixed])
   const availableStudents = useMemo(() => students.filter(s => !fixedStudentNums.has(s.num)), [students, fixedStudentNums])
+  const availableNums = useMemo(() => new Set(availableStudents.map(s => s.num)), [availableStudents])
+  // 고정 역할 학생은 선택에서 제외
+  const selectedNums = useMemo(() => new Set(roleSelectedNums.filter(n => availableNums.has(n))), [roleSelectedNums, availableNums])
   const varCount = validVar.length
 
   const handleFixedChange = (d: Row[]) => {
