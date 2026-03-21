@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'
-import { useAppData } from '../store'
+import { useAppData, setData } from '../store'
 import type { Student } from '../store'
 import { shuffleArray } from '../utils/shuffle'
 import PageHeader from './PageHeader'
@@ -9,23 +9,23 @@ import CardReveal from './CardReveal'
 const rowBg = (i: number) => i % 2 === 0 ? '#EAEDE2' : '#E4E8E0'
 const fmtStudent = (s: Student) => `${s.num}번 ${s.name}`
 
-// 탭 이동 시 결과 유지용 캐시
-let cachedPairs: { student: Student; role: string }[] | null = null
-let cachedShowPreview = false
-
 export default function RoleAssign() {
-  const { students: allStudents, fixedRoles, variableRoles, roleSelectedNums } = useAppData()
-  const [pairs, setPairsState] = useState<{ student: Student; role: string }[]>(cachedPairs ?? [])
-  const [showPreview, setShowPreviewState] = useState(cachedShowPreview)
+  const appData = useAppData()
+  const { students: allStudents, fixedRoles, variableRoles, roleSelectedNums } = appData
+
+  const savedRole = appData.roleResult
+  const [pairs, setPairsState] = useState<{ student: Student; role: string }[]>(savedRole?.pairs ?? [])
+  const [showPreview, setShowPreviewState] = useState(savedRole?.showPreview ?? false)
 
   const setPairs = useCallback((p: { student: Student; role: string }[]) => {
-    cachedPairs = p
     setPairsState(p)
   }, [])
   const setShowPreview = useCallback((v: boolean) => {
-    cachedShowPreview = v
     setShowPreviewState(v)
-  }, [])
+    if (v) {
+      setData({ roleResult: { pairs, showPreview: true } })
+    }
+  }, [pairs])
 
   const varCount = variableRoles.length
   const studentByNum = useMemo(() => new Map(allStudents.map(s => [s.num, s])), [allStudents])
@@ -55,10 +55,9 @@ export default function RoleAssign() {
   }, [setShowPreview])
 
   const reset = () => {
-    cachedPairs = null
-    cachedShowPreview = false
     setPairs([])
-    setShowPreview(false)
+    setShowPreviewState(false)
+    setData({ roleResult: null })
   }
 
   const selectedStudents = useMemo(() =>
@@ -92,10 +91,12 @@ export default function RoleAssign() {
       availableStudents.filter(s => selectedNums.has(s.num))
     )
 
-    setPairs(variableRoles.map((r, i) => ({
+    const newPairs = variableRoles.map((r, i) => ({
       student: shuffled[i],
       role: r.name,
-    })).filter(p => p.student))
+    })).filter(p => p.student)
+    setPairs(newPairs)
+    setData({ roleResult: { pairs: newPairs, showPreview: false } })
   }, [canCreate]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!varCount) {

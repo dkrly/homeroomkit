@@ -36,6 +36,16 @@ export interface BingoQuestion {
   required?: boolean
 }
 
+export interface SeatingResult {
+  assigned: Record<string, { num: number; name: string }>  // seatIdx → student
+  phase: 'ready' | 'done'
+}
+
+export interface RoleResult {
+  pairs: { student: Student; role: string }[]
+  showPreview: boolean
+}
+
 export interface AppData {
   students: Student[]
   fixedRoles: FixedRole[]
@@ -43,6 +53,8 @@ export interface AppData {
   roleSelectedNums: number[]
   seating: SeatingConfig
   bingoQuestions: BingoQuestion[]
+  seatingResult?: SeatingResult | null
+  roleResult?: RoleResult | null
 }
 
 const defaultData: AppData = {

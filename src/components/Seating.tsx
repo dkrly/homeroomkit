@@ -11,12 +11,17 @@ import PrintButton from './PrintButton'
 const SEATING_REVEAL_INTERVAL = 200
 const ROLLING_TICK_INTERVAL = 60
 
-// 탭 이동 시 결과 유지용 캐시
-let cachedAssigned: Map<number, Student> | null = null
-let cachedPhase: 'ready' | 'spinning' | 'stopping' | 'done' = 'ready'
+function loadSeatingResult(data: ReturnType<typeof useAppData>): { assigned: Map<number, Student>; phase: 'ready' | 'done' } {
+  const sr = data.seatingResult
+  if (!sr || sr.phase !== 'done') return { assigned: new Map(), phase: 'ready' }
+  const m = new Map<number, Student>()
+  for (const [k, v] of Object.entries(sr.assigned)) m.set(Number(k), v)
+  return { assigned: m, phase: 'done' }
+}
 
 export default function Seating() {
-  const { students, seating } = useAppData()
+  const appData = useAppData()
+  const { students, seating } = appData
   const { rows, cols, disabled, fixed } = seating
 
   const studentByNum = useMemo(() => new Map(students.map(s => [s.num, s])), [students])
@@ -35,23 +40,32 @@ export default function Seating() {
     return m
   }, [activeIndices])
 
+  const savedResult = useMemo(() => loadSeatingResult(appData), []) // eslint-disable-line
+
   const [fixingIdx, setFixingIdx] = useState<number | null>(null)
-  const [assigned, setAssignedState] = useState<Map<number, Student>>(cachedAssigned ?? new Map())
+  const [assigned, setAssignedState] = useState<Map<number, Student>>(savedResult.assigned)
 
   const setAssigned = useCallback((m: Map<number, Student>) => {
-    cachedAssigned = m
     setAssignedState(m)
+  }, [])
+
+  const saveResult = useCallback((m: Map<number, Student>, p: 'ready' | 'done') => {
+    const obj: Record<string, { num: number; name: string }> = {}
+    for (const [k, v] of m) obj[String(k)] = { num: v.num, name: v.name }
+    setData({ seatingResult: p === 'done' ? { assigned: obj, phase: 'done' } : null })
   }, [])
 
   const { phase, stoppedUpTo, startSpin: startShuffleReveal, stopSpin, reset: resetShuffle, finishImmediately } = useShuffleReveal({
     itemCount: activeIndices.length,
     revealInterval: SEATING_REVEAL_INTERVAL,
-    initialPhase: cachedAssigned ? cachedPhase : 'ready',
-    initialStoppedUpTo: cachedAssigned && cachedPhase === 'done' ? activeIndices.length : -1,
+    initialPhase: savedResult.phase,
+    initialStoppedUpTo: savedResult.phase === 'done' ? activeIndices.length : -1,
   })
 
-  // phase 변경 시 캐시 동기화
-  useEffect(() => { cachedPhase = phase }, [phase])
+  // done 시 localStorage 저장
+  useEffect(() => {
+    if (phase === 'done' && assigned.size > 0) saveResult(assigned, 'done')
+  }, [phase]) // eslint-disable-line
 
   // 초기화: 학생 수만큼 자동 활성화
   useEffect(() => {
@@ -119,7 +133,6 @@ export default function Seating() {
     }
 
     setAssigned(result)
-    cachedPhase = 'done'
     finishImmediately()
   }, [buildFixedResult, students, cols, rows, disabledSet, finishImmediately, setAssigned])
 
@@ -127,17 +140,14 @@ export default function Seating() {
     const { result } = buildFixedResult()
     const a = shuffleWithDistancing(students, activeIndices, result, seating.distanced || [], cols)
     setAssigned(a)
-    cachedPhase = 'spinning'
     startShuffleReveal()
   }, [buildFixedResult, students, activeIndices, seating, cols, startShuffleReveal, setAssigned])
 
   const handleReset = useCallback(() => {
     if (phase === 'done' || phase === 'ready') {
       if (!window.confirm('초기화하시겠습니까?')) return
-      setData({ seating: { ...seating, fixed: {} } })
+      setData({ seating: { ...seating, fixed: {} }, seatingResult: null })
       resetShuffle()
-      cachedPhase = 'ready'
-      cachedAssigned = null
       setAssigned(new Map())
     }
   }, [phase, seating, resetShuffle])
