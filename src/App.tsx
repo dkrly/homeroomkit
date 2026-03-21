@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import ClassTimetable from './components/ClassTimetable'
 import Schedule from './components/Schedule'
 import RoleAssign from './components/RoleAssign'
@@ -60,13 +60,32 @@ function loadZoom(): number {
   return v ? Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, Number(v))) : 1
 }
 
+const validTabs = new Set<string>(Object.keys(pages))
+
+function getTabFromHash(): TabId {
+  const h = window.location.hash.replace('#', '')
+  return (validTabs.has(h) && h !== 'settings') ? h as TabId : 'timetable'
+}
+
 const pageStyle = (tab: TabId) =>
   tab === 'combo'
     ? '@page { size: 594mm 420mm; margin: 0; }'
     : '@page { size: A4 portrait; margin: 0; }'
 
 export default function App() {
-  const [tab, setTab] = useState<TabId>('timetable')
+  const [tab, setTabState] = useState<TabId>(getTabFromHash)
+  const setTab = useCallback((id: TabId) => {
+    setTabState(id)
+    window.location.hash = id === 'timetable' ? '' : id
+  }, [])
+
+  // 뒤로가기/앞으로가기 대응
+  useEffect(() => {
+    const onHash = () => setTabState(getTabFromHash())
+    window.addEventListener('hashchange', onHash)
+    return () => window.removeEventListener('hashchange', onHash)
+  }, [])
+
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [zoom, setZoom] = useState(loadZoom)
   const [settingsAuthed, setSettingsAuthed] = useState(false)
