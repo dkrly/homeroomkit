@@ -444,7 +444,7 @@ function ResetTab() {
     localStorage.removeItem('homeroomkit')
     localStorage.removeItem('homeroomkit-zoom')
     setDone(true)
-    setTimeout(() => window.location.reload(), 800)
+    setTimeout(() => { window.location.href = window.location.pathname }, 800)
   }
 
   return (
