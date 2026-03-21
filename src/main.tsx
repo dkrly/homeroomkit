@@ -9,7 +9,7 @@ const updateSW = registerSW({
     const toast = document.createElement('div')
     toast.id = 'pwa-toast'
     toast.innerHTML = `
-      <span>새 버전이 있습니다</span>
+      <span>새 버전이 있습니다!</span>
       <button id="pwa-update">업데이트</button>
       <button id="pwa-dismiss">✕</button>
     `
