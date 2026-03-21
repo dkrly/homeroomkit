@@ -117,7 +117,7 @@ export default function RoleAssign() {
       </div>
 
       {showPreview && (
-        <div className="mt-8">
+        <div className="mt-8 print:!mt-0">
           <PrintButton />
 
           <div className="page">

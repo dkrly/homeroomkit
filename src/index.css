@@ -81,6 +81,7 @@
     print-color-adjust: exact;
   }
   nav, .print\:hidden, button { display: none !important; }
+  main { padding: 0 !important; }
   .print-reset {
     margin: 0 !important;
     padding: 0 !important;
@@ -88,6 +89,7 @@
     overflow: visible !important;
     zoom: 1 !important;
   }
+  .print\:\!mt-0 { margin-top: 0 !important; }
   .page {
     box-shadow: none;
     border-radius: 0;
