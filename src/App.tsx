@@ -72,7 +72,7 @@ const validTabs = new Set<string>(Object.keys(pages))
 
 function getTabFromHash(): TabId {
   const h = window.location.hash.replace('#', '')
-  return (validTabs.has(h) && h !== 'settings') ? h as TabId : 'timetable'
+  return validTabs.has(h) ? h as TabId : 'timetable'
 }
 
 const pageStyle = (tab: TabId) =>
@@ -84,7 +84,6 @@ export default function App() {
   const [tab, setTabState] = useState<TabId>(getTabFromHash)
   const setTab = useCallback((id: TabId) => {
     setTabState(id)
-    if (id === 'settings') return // settings는 hash에 노출하지 않음
     window.location.hash = id === 'timetable' ? '' : id
   }, [])
 
@@ -257,7 +256,7 @@ export default function App() {
 
       {/* 메인 콘텐츠 */}
       <main className="print-reset flex-1 flex justify-center items-start overflow-auto p-8 pt-16">
-        {settingsPending && !settingsAuthed ? (
+        {(settingsPending || tab === 'settings') && !settingsAuthed ? (
           <div className="flex items-center justify-center py-20">
             <div className="rounded-2xl p-8 w-80" style={{ background: '#fff', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
               <h2 className="text-lg font-bold mb-1" style={{ color: '#1E2A1E' }}>설정</h2>
