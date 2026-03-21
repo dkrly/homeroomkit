@@ -59,7 +59,7 @@ export default function CardReveal({ roles, students, results, onComplete, onRes
           disabled={phase === 'spinning' || phase === 'stopping'}
           className={`btn-action ${phase === 'spinning' || phase === 'stopping' ? 'bg-ink/10 !text-ink/30 cursor-not-allowed' : 'bg-ink/20 !text-ink hover:bg-ink/30'}`}
         >
-          돌아가기
+          초기화
         </button>
       </div>
 
