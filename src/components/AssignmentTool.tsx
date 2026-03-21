@@ -10,7 +10,7 @@ type SlotKey = 'student' | 'activity' | 'apply'
 
 interface LogEntry { t: 'info' | 'warn' | 'err'; m: string }
 interface MapEntry { raw: string; mt: string; code: string | null; name: string | null }
-interface Stats { total: number; matched: number; noApply: number; unmatched: number }
+interface Stats { total: number; matched: number; assigned: number; noApply: number; unmatched: number }
 
 const SLOTS: { key: SlotKey; icon: string; label: string; hint: string }[] = [
   { key: 'student', icon: '👥', label: '학생목록', hint: '*학생목록.xlsx' },
@@ -190,16 +190,17 @@ function runProcess(files: Record<SlotKey, FileSlot>) {
     if (fc) log('warn', `퍼지 매칭: ${fc}건`)
     if (fl) log('err', `매핑 실패: ${fl}건`)
 
+    const assignedStudents = new Set(result.map(r => r['번호']))
     const wb = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(result), 'Sheet1')
 
     return {
-      stats: { total: students.length, matched, noApply, unmatched },
+      stats: { total: students.length, matched, assigned: assignedStudents.size, noApply, unmatched },
       logs, maps, wb,
     }
   } catch (e) {
     log('err', `오류: ${(e as Error).message}`)
-    return { stats: { total: 0, matched: 0, noApply: 0, unmatched: 0 }, logs, maps: [], wb: null }
+    return { stats: { total: 0, matched: 0, assigned: 0, noApply: 0, unmatched: 0 }, logs, maps: [], wb: null }
   }
 }
 
@@ -288,7 +289,7 @@ export default function AssignmentTool() {
     XLSX.writeFile(result.wb, `주제선택_배정결과_${ts}.xlsx`)
   }
 
-  const assigned = result ? (result.stats.matched > 0 ? Math.round(result.stats.matched / 4) : 0) : 0
+  const assigned = result?.stats.assigned ?? 0
   const sortedMaps = result ? [...result.maps].sort((a, b) => {
     if (!a.code && !b.code) return 0
     if (!a.code) return 1

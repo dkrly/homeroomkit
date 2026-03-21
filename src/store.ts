@@ -81,10 +81,12 @@ function load(): AppData {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return defaultData
     const parsed = migrate(JSON.parse(raw))
+    if (typeof parsed !== 'object' || parsed === null) return defaultData
     const students = parsed.students as unknown[]
-    if (students?.[0] && typeof students[0] !== 'object') {
-      return defaultData
-    }
+    if (students?.[0] && typeof students[0] !== 'object') return defaultData
+    if (parsed.seating && typeof parsed.seating !== 'object') return defaultData
+    if (parsed.fixedRoles && !Array.isArray(parsed.fixedRoles)) return defaultData
+    if (parsed.variableRoles && !Array.isArray(parsed.variableRoles)) return defaultData
     return { ...defaultData, ...parsed } as AppData
   } catch {
     return defaultData

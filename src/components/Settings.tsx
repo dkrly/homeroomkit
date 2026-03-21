@@ -7,10 +7,10 @@ import { buildDisabled } from '../utils/seating'
 import { LoadPreset } from './PasswordGate'
 
 const settingsTabs = [
-  { id: 'students', label: '학생 목록' },
-  { id: 'roles', label: '1인 1역' },
-  { id: 'seating', label: '자리 배치' },
-  { id: 'bingo', label: '친구 탐험' },
+  { id: 'students', label: '우리반 학생' },
+  { id: 'roles', label: '우리반 역할' },
+  { id: 'seating', label: '우리반 자리' },
+  { id: 'bingo', label: '친구탐험' },
   { id: 'reset', label: '초기화' },
 ] as const
 
@@ -336,8 +336,6 @@ function BingoTab() {
     </div>
   )
 }
-
-// --- 초기화 ---
 
 // --- 추가 옵션 ---
 

@@ -176,7 +176,7 @@ export default function Seating() {
             className={`btn-action ${phase === 'spinning' || phase === 'stopping' ? 'bg-ink/10 !text-ink/30 cursor-not-allowed' : 'bg-ink/20 !text-ink hover:bg-ink/30'}`}>
             초기화
           </button>
-          <PrintButton disabled={phase !== 'done'} inline />
+          <PrintButton disabled={phase !== 'done'} inline title="우리반_자리" />
         </div>
       </div>
 

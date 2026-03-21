@@ -50,6 +50,14 @@ const pages: Record<TabId, React.FC> = {
 
 const noPrintButton = new Set<TabId>(['role', 'seating', 'bingo', 'assignment', 'settings'])
 
+const printTitles: Partial<Record<TabId, string>> = {
+  students: '우리반_학생',
+  timetable: '우리반_시간표',
+  teacher: '정보_시간표',
+  schedule: '일과운영표',
+  combo: '시간표_일과운영표',
+}
+
 const ZOOM_STEP = 0.1
 const ZOOM_MIN = 0.5
 const ZOOM_MAX = 1.5
@@ -252,7 +260,7 @@ export default function App() {
             <div className="rounded-2xl p-8 w-80" style={{ background: '#fff', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
               <h2 className="text-lg font-bold mb-1" style={{ color: '#1E2A1E' }}>설정</h2>
               <p className="text-sm mb-4" style={{ color: '#1E2A1E', opacity: 0.5 }}>비밀번호를 입력하세요</p>
-              <form onSubmit={e => { e.preventDefault(); handleSettingsLogin() }}>
+              <form onSubmit={e => { e.preventDefault(); handleSettingsLogin().catch(() => setSettingsErr('인증 오류')) }}>
                 <input
                   type="password"
                   value={settingsPw}
@@ -280,7 +288,7 @@ export default function App() {
           </div>
         ) : (
           <div className="print-reset origin-top" style={{ zoom }}>
-            {!noPrintButton.has(tab) && <PrintButton />}
+            {!noPrintButton.has(tab) && <PrintButton title={printTitles[tab]} />}
             <Page />
           </div>
         )}

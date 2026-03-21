@@ -1,9 +1,7 @@
-import { days, grid, subjectColors } from '../data/timetable'
+import { days, grid, getSubjectColor } from '../data/timetable'
 import { TimetableContent } from './Timetable'
 import { ScheduleContent } from './Schedule'
 import PageHeader from './PageHeader'
-
-const getColor = (label: string) => subjectColors[label] ?? { bg: '#EFF1E8', bar: '#B0B8A0', fg: '#4A4A4A' }
 
 // A4 content: 730×1063, A2 panel: ~1050×1503 → scale ≈ 1.41
 const PANEL_ZOOM = 1.41
@@ -15,7 +13,7 @@ export default function TimetableSchedule() {
         {/* 왼쪽: 시간표 */}
         <div className="flex-1 flex flex-col min-w-0" style={{ zoom: PANEL_ZOOM }}>
           <PageHeader badge="Class" title="우리반 시간표" />
-          <TimetableContent days={days} grid={grid} getColor={getColor} />
+          <TimetableContent days={days} grid={grid} getColor={getSubjectColor} />
         </div>
 
         {/* 세로 구분선 */}

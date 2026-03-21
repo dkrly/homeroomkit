@@ -143,7 +143,7 @@ export default function RoleAssign() {
               className="btn-action bg-ink/20 !text-ink hover:bg-ink/30">
               초기화
             </button>
-            <PrintButton inline />
+            <PrintButton inline title="우리반_역할" />
           </div>
 
           <div className="page">

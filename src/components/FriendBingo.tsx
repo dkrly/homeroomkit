@@ -110,7 +110,7 @@ export default function FriendBingo() {
           </svg>
           섞기
         </button>
-        <PrintButton inline />
+        <PrintButton inline title="친구탐험" />
       </div>
 
       <BingoSheet items={items} />

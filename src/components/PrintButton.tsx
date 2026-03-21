@@ -1,7 +1,19 @@
-export default function PrintButton({ disabled, inline }: { disabled?: boolean; inline?: boolean } = {}) {
+function getTimestamp() {
+  const d = new Date()
+  return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}${String(d.getHours()).padStart(2, '0')}${String(d.getMinutes()).padStart(2, '0')}${String(d.getSeconds()).padStart(2, '0')}`
+}
+
+export default function PrintButton({ disabled, inline, title }: { disabled?: boolean; inline?: boolean; title?: string } = {}) {
+  const handlePrint = () => {
+    const origTitle = document.title
+    if (title) document.title = `${title}_${getTimestamp()}`
+    window.print()
+    document.title = origTitle
+  }
+
   const btn = (
     <button
-      onClick={() => window.print()}
+      onClick={handlePrint}
       disabled={disabled}
       className={`flex items-center gap-1.5 border-none px-5 py-2.5 rounded-lg font-display text-[13px] font-semibold transition-all shadow-md print:hidden
         ${disabled ? 'bg-ink/20 text-ink/30 cursor-not-allowed' : 'bg-ink text-bg cursor-pointer hover:bg-[#2A3D2A] hover:-translate-y-0.5'}`}

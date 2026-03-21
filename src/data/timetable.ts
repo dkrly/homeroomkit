@@ -31,3 +31,9 @@ export const grid: (string | null)[][] = [
   ['수학', '주선', '정보', '주선', '체육'],
   [null, '주선', null, '주선', null],
 ]
+
+const DEFAULT_COLOR = { bg: '#EFF1E8', bar: '#B0B8A0', fg: '#4A4A4A' }
+
+export function getSubjectColor(label: string) {
+  return subjectColors[label] ?? DEFAULT_COLOR
+}
