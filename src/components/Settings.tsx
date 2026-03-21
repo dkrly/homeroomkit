@@ -362,7 +362,16 @@ function AdvancedOptions() {
 
 function DistancingEditor() {
   const { seating, students } = useAppData()
-  const distanced = seating.distanced || []
+  const studentNums = useMemo(() => new Set(students.map(s => s.num)), [students])
+  // 삭제된 학생이 포함된 쌍 자동 정리
+  const distanced = useMemo(() => {
+    const raw = seating.distanced || []
+    const valid = raw.filter(([a, b]) => studentNums.has(a) && studentNums.has(b))
+    if (valid.length !== raw.length) {
+      setData({ seating: { ...seating, distanced: valid } })
+    }
+    return valid
+  }, [seating, studentNums]) // eslint-disable-line
   const [selA, setSelA] = useState<number | null>(null)
   const [selB, setSelB] = useState<number | null>(null)
 

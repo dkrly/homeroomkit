@@ -374,6 +374,7 @@ function useRollingTick() {
 
 function RollingName({ students, offset }: { students: Student[]; offset: number }) {
   const tick = useRollingTick()
+  if (students.length === 0) return null
   const s = students[(tick + offset) % students.length]
   return (
     <div className="text-center">

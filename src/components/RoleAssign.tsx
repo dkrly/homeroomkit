@@ -16,7 +16,8 @@ export default function RoleAssign() {
   const varCount = variableRoles.length
   const fixedStudentNums = useMemo(() => new Set(fixedRoles.map(r => r.studentNum).filter(Boolean) as number[]), [fixedRoles])
   const availableStudents = useMemo(() => allStudents.filter(s => !fixedStudentNums.has(s.num)), [allStudents, fixedStudentNums])
-  const selectedNums = useMemo(() => new Set(roleSelectedNums.filter(n => !fixedStudentNums.has(n))), [roleSelectedNums, fixedStudentNums])
+  const availableNums = useMemo(() => new Set(availableStudents.map(s => s.num)), [availableStudents])
+  const selectedNums = useMemo(() => new Set(roleSelectedNums.filter(n => availableNums.has(n))), [roleSelectedNums, availableNums])
   const canCreate = varCount > 0 && selectedNums.size === varCount
 
   const savedRole = appData.roleResult

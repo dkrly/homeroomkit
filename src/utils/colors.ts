@@ -8,8 +8,11 @@ const NUM_COLORS: { bg: string; bar: string; fg: string }[] = [
   { bg: '#E4EDF2', bar: '#5E8FA6', fg: '#2B5F78' },
 ]
 
+const FALLBACK_COLOR = { bg: '#E4EDF2', bar: '#5E8FA6', fg: '#2B5F78' }
+
 export function getStudentColor(num: number): { bg: string; bar: string; fg: string } {
+  if (num <= 0) return FALLBACK_COLOR
   if (num >= 30) return NUM_COLORS[NUM_COLORS.length - 1]
   const group = Math.floor((num - 1) / 5)
-  return NUM_COLORS[group]
+  return NUM_COLORS[group] ?? FALLBACK_COLOR
 }
