@@ -67,12 +67,15 @@ export default function Seating() {
     if (phase === 'done' && assigned.size > 0) saveResult(assigned, 'done')
   }, [phase]) // eslint-disable-line
 
-  // 초기화: 학생 수만큼 자동 활성화
+  // 학생 수에 맞게 좌석 자동 조정 (셔플 결과 없을 때만)
   useEffect(() => {
-    if (disabled.length === 0 && students.length < totalSeats) {
-      setData({ seating: { ...seating, disabled: buildDisabled(students.length, totalSeats) } })
+    if (phase !== 'ready') return
+    if (students.length === 0) return
+    const activeCount = totalSeats - disabled.length
+    if (activeCount !== students.length) {
+      setData({ seating: { ...seating, disabled: buildDisabled(students.length, totalSeats), fixed: {} } })
     }
-  }, []) // eslint-disable-line
+  }, [students.length]) // eslint-disable-line
 
   const toggleSeat = (idx: number) => {
     if (phase !== 'ready') return
