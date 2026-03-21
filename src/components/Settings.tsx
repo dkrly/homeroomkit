@@ -187,6 +187,7 @@ function SeatingTab() {
         <p className="text-xs text-danger mb-2">활성 좌석({active})과 학생 수({students.length})가 다릅니다.</p>
       )}
 
+      <DistancingEditor />
     </div>
   )
 }
