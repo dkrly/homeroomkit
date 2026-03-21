@@ -1,8 +1,17 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import { exportData, importData } from '../../store'
+
+function getTimestamp() {
+  const d = new Date()
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}${pad(d.getHours())}${pad(d.getMinutes())}`
+}
 
 export default function ResetTab() {
   const [confirm, setConfirm] = useState(false)
   const [done, setDone] = useState(false)
+  const [importMsg, setImportMsg] = useState<{ ok: boolean; text: string } | null>(null)
+  const fileRef = useRef<HTMLInputElement>(null)
 
   const handleReset = () => {
     localStorage.removeItem('homeroomkit')
@@ -11,8 +20,65 @@ export default function ResetTab() {
     setTimeout(() => { window.location.href = window.location.pathname }, 800)
   }
 
+  const handleExport = () => {
+    const blob = new Blob([exportData()], { type: 'application/json' })
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = `homeroomkit_backup_${getTimestamp()}.json`
+    a.click()
+    URL.revokeObjectURL(a.href)
+  }
+
+  const handleImport = () => {
+    fileRef.current?.click()
+  }
+
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      try {
+        importData(reader.result as string)
+        setImportMsg({ ok: true, text: '불러오기 완료' })
+      } catch {
+        setImportMsg({ ok: false, text: '올바른 백업 파일이 아닙니다' })
+      }
+    }
+    reader.readAsText(file)
+    e.target.value = ''
+  }
+
   return (
-    <div className="py-8">
+    <div className="py-8 flex flex-col gap-6">
+      {/* 백업 / 복원 */}
+      <div className="rounded-xl p-6" style={{ background: '#F0F9FF', border: '1px solid #BAE6FD' }}>
+        <h3 className="text-lg font-bold mb-2" style={{ color: '#0C4A6E' }}>데이터 백업 / 복원</h3>
+        <p className="text-sm mb-4" style={{ color: '#0C4A6E', opacity: 0.7 }}>
+          현재 데이터를 JSON 파일로 내보내거나, 백업 파일에서 복원할 수 있습니다.<br />
+          기기 변경, 브라우저 초기화 등에 대비하세요.
+        </p>
+        <div className="flex items-center gap-3">
+          <button onClick={handleExport}
+            className="px-5 py-2.5 rounded-lg font-bold text-sm border-none cursor-pointer"
+            style={{ background: '#0284C7', color: '#fff' }}>
+            내보내기
+          </button>
+          <button onClick={handleImport}
+            className="px-5 py-2.5 rounded-lg font-bold text-sm border-none cursor-pointer"
+            style={{ background: '#fff', color: '#0284C7', border: '1px solid #0284C7' }}>
+            불러오기
+          </button>
+          <input ref={fileRef} type="file" accept=".json" onChange={onFileChange} className="hidden" />
+          {importMsg && (
+            <span className="text-sm font-bold" style={{ color: importMsg.ok ? '#059669' : '#DC2626' }}>
+              {importMsg.text}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* 초기화 */}
       <div className="rounded-xl p-6" style={{ background: '#FEF2F2', border: '1px solid #FECACA' }}>
         <h3 className="text-lg font-bold mb-2" style={{ color: '#991B1B' }}>데이터 초기화</h3>
         <p className="text-sm mb-1" style={{ color: '#991B1B' }}>

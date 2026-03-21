@@ -97,6 +97,18 @@ function save(data: AppData) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
 }
 
+export function exportData(): string {
+  return localStorage.getItem(STORAGE_KEY) ?? JSON.stringify(defaultData)
+}
+
+export function importData(json: string) {
+  const parsed = JSON.parse(json)
+  if (typeof parsed !== 'object' || parsed === null) throw new Error('invalid')
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed))
+  current = load()
+  listeners.forEach(fn => fn())
+}
+
 let current = load()
 const listeners = new Set<() => void>()
 
