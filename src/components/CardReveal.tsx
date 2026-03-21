@@ -115,8 +115,11 @@ export default function CardReveal({ roles, students, results, onComplete, onRes
               }}
             >
               <div
-                className="text-sm font-black mb-2 transition-colors duration-300"
-                style={{ color: stopped ? sc.fg : 'rgba(255,255,255,0.9)' }}
+                className="font-black mb-2 transition-colors duration-300 text-center whitespace-nowrap"
+                style={{
+                  color: stopped ? sc.fg : 'rgba(255,255,255,0.9)',
+                  fontSize: role.length > 8 ? '11px' : role.length > 6 ? '12px' : '14px',
+                }}
               >
                 {role}
               </div>
