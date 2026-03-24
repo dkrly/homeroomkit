@@ -169,7 +169,7 @@ export default function PhotoTool() {
         let num: number, name: string, matched: boolean
 
         if (parsed) {
-          const student = students.find(s => s.num === parsed.num)
+          const student = students.find(s => Number(s.num) === parsed.num)
           if (student) {
             num = student.num; name = student.name; matched = true
           } else if (parsed.name) {
