@@ -74,7 +74,7 @@ function canvasToBlob(canvas: HTMLCanvasElement, quality: number): Promise<Blob>
   })
 }
 
-async function cropAndEncode(img: HTMLImageElement, face: { x: number; y: number } | null, preset: typeof NEIS) {
+async function cropAndEncode(img: HTMLImageElement, face: { x: number; y: number } | null, preset: typeof PRESET) {
   const canvas = document.createElement('canvas')
   canvas.width = preset.w
   canvas.height = preset.h
