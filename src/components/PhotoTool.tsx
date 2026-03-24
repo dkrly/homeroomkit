@@ -243,20 +243,26 @@ export default function PhotoTool() {
         <style>{`
           @media print {
             .photo-print-page {
+              display: flex !important;
+              flex-direction: column !important;
               height: 100vh !important;
               overflow: hidden !important;
-              padding: 24px 20px 16px !important;
+              padding: 20px 18px 12px !important;
             }
             .photo-print-page .photo-grid {
               flex: 1;
               min-height: 0;
+              overflow: hidden;
+            }
+            .photo-print-page .photo-cell {
+              overflow: hidden;
+              min-height: 0;
             }
             .photo-print-page .photo-cell img {
-              flex: 1;
-              min-height: 0;
               width: 100%;
-              object-fit: cover;
-              border-radius: 3px;
+              height: 100%;
+              object-fit: contain;
+              border-radius: 2px;
               border: 1px solid #ddd;
             }
           }
@@ -266,17 +272,20 @@ export default function PhotoTool() {
           display: 'grid',
           gridTemplateColumns: `repeat(${PRINT_COLS}, 1fr)`,
           gridTemplateRows: `repeat(${PRINT_ROWS}, 1fr)`,
-          gap: 4,
+          gap: 3,
           flex: 1,
           minHeight: 0,
+          overflow: 'hidden',
         }}>
           {results.map((entry, i) => (
             <div key={i} className="photo-cell" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: 0, overflow: 'hidden' }}>
-              <img src={entry.id.url} alt={entry.name} style={{
-                width: '100%', flex: 1, minHeight: 0, objectFit: 'cover',
-                borderRadius: 3, border: '1px solid #e5e7eb',
-              }} />
-              <div style={{ fontSize: 10, fontWeight: 700, marginTop: 2, textAlign: 'center', lineHeight: 1.1, whiteSpace: 'nowrap' }}>
+              <div style={{ flex: 1, minHeight: 0, width: '100%', overflow: 'hidden' }}>
+                <img src={entry.id.url} alt={entry.name} style={{
+                  width: '100%', height: '100%', objectFit: 'contain',
+                  borderRadius: 2, border: '1px solid #e5e7eb',
+                }} />
+              </div>
+              <div style={{ fontSize: 9, fontWeight: 700, marginTop: 1, textAlign: 'center', lineHeight: 1, whiteSpace: 'nowrap', flexShrink: 0 }}>
                 <span style={{ color: '#888', fontWeight: 600 }}>{entry.num}</span>{' '}{entry.name}
               </div>
             </div>
