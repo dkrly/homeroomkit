@@ -55,6 +55,8 @@ export interface AppData {
   bingoQuestions: BingoQuestion[]
   seatingResult?: SeatingResult | null
   roleResult?: RoleResult | null
+  grade?: number
+  classNum?: number
 }
 
 const defaultData: AppData = {

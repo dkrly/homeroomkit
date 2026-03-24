@@ -10,8 +10,9 @@ import Settings from './components/Settings'
 import TimetableSchedule from './components/TimetableSchedule'
 import PrintButton from './components/PrintButton'
 import AssignmentTool from './components/AssignmentTool'
+import PhotoTool from './components/PhotoTool'
 import { hashPassword } from './utils/crypto'
-type TabId = 'students' | 'timetable' | 'teacher' | 'schedule' | 'combo' | 'role' | 'seating' | 'bingo' | 'assignment' | 'settings'
+type TabId = 'students' | 'timetable' | 'teacher' | 'schedule' | 'combo' | 'role' | 'seating' | 'bingo' | 'assignment' | 'photo' | 'settings'
 
 interface NavGroup {
   icon: string
@@ -32,6 +33,7 @@ const navGroups: NavGroup[] = [
   { icon: '🛠️', label: '도구', items: [
     { id: 'bingo', label: '친구탐험' },
     { id: 'assignment', label: '주제선택 배정' },
+    { id: 'photo', label: '증명사진' },
   ]},
 ]
 
@@ -45,10 +47,11 @@ const pages: Record<TabId, React.FC> = {
   bingo: FriendBingo,
   combo: TimetableSchedule,
   assignment: AssignmentTool,
+  photo: PhotoTool,
   settings: Settings,
 }
 
-const noPrintButton = new Set<TabId>(['role', 'seating', 'bingo', 'assignment', 'settings'])
+const noPrintButton = new Set<TabId>(['role', 'seating', 'bingo', 'assignment', 'photo', 'settings'])
 
 const printTitles: Partial<Record<TabId, string>> = {
   students: '우리반_학생',

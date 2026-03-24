@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -21,8 +21,9 @@ function makePasswordHash(password: string): string {
   return pbkdf2Sync(password, salt, 100_000, 32, 'sha256').toString('hex')
 }
 
-export default defineConfig(() => {
-  const password = process.env.VITE_ENCRYPTION_PASSWORD ?? ''
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  const password = env.VITE_ENCRYPTION_PASSWORD ?? ''
 
   return {
     plugins: [
