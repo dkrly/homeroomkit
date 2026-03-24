@@ -4,8 +4,7 @@ import PageHeader from './PageHeader'
 import * as faceapi from 'face-api.js'
 import JSZip from 'jszip'
 
-const NEIS = { w: 600, h: 800, quality: 0.92 }
-const ID = { w: 1240, h: 1653, quality: 0.92 }
+const PRESET = { w: 1240, h: 1653, quality: 0.92 }
 const MAX_SIZE = 200 * 1024
 
 interface ProcessedEntry {
@@ -15,8 +14,10 @@ interface ProcessedEntry {
   origSize: number
   origW: number
   origH: number
-  neis: { name: string; blob: Blob; url: string }
-  id: { name: string; blob: Blob; url: string }
+  neisName: string
+  idName: string
+  blob: Blob
+  url: string
 }
 
 // --- Face detection (face-api.js) ---
@@ -162,8 +163,7 @@ export default function PhotoTool() {
       try {
         const img = await loadImage(file)
         const face = faceEnabled ? await detectFaceCenter(img) : null
-        const neisBlob = await cropAndEncode(img, face, NEIS)
-        const idBlob = await cropAndEncode(img, face, ID)
+        const blob = await cropAndEncode(img, face, PRESET)
 
         const parsed = parseFilename(file.name)
         let num: number, name: string, matched: boolean
@@ -184,8 +184,9 @@ export default function PhotoTool() {
         const entry: ProcessedEntry = {
           num, name, matched,
           origSize: file.size, origW: img.width, origH: img.height,
-          neis: { name: `${name}(${num}).jpg`, blob: neisBlob, url: URL.createObjectURL(neisBlob) },
-          id: { name: `${grade}-${classNum}-${num} ${name}.jpg`, blob: idBlob, url: URL.createObjectURL(idBlob) },
+          neisName: `${name}(${num}).jpg`,
+          idName: `${grade}-${classNum}-${num} ${name}.jpg`,
+          blob, url: URL.createObjectURL(blob),
         }
         processed.push(entry)
       } catch (err) {
@@ -195,27 +196,24 @@ export default function PhotoTool() {
     }
 
     setResults(processed)
-    const neisTotal = processed.reduce((s, r) => s + r.neis.blob.size, 0)
-    const idTotal = processed.reduce((s, r) => s + r.id.blob.size, 0)
+    const total = processed.reduce((s, r) => s + r.blob.size, 0)
     setStats(
-      `${processed.length}장 처리 완료 · 나이스 총 ${fmt(neisTotal)} · 학생증 총 ${fmt(idTotal)}` +
+      `${processed.length}장 처리 완료 · 총 ${fmt(total)}` +
       (faceEnabled && faceModelLoaded ? ' · 얼굴 감지 ON' : ' · 얼굴 감지 OFF')
     )
     setProgress(-1)
   }, [students, grade, classNum, faceEnabled])
 
-  const downloadZip = useCallback(async () => {
+  const downloadZip = useCallback(async (naming: 'neis' | 'id') => {
     if (!results.length) return
     const today = new Date().toISOString().slice(0, 10)
     const zip = new JSZip()
-    const neisFolder = zip.folder('나이스')!
-    const idFolder = zip.folder('학생증')!
     for (const r of results) {
-      neisFolder.file(r.neis.name, r.neis.blob)
-      idFolder.file(r.id.name, r.id.blob)
+      zip.file(naming === 'neis' ? r.neisName : r.idName, r.blob)
     }
+    const label = naming === 'neis' ? '나이스' : '학생증'
     const blob = await zip.generateAsync({ type: 'blob' })
-    download(blob, `증명사진_${grade}-${classNum}_${today}.zip`)
+    download(blob, `${label}_${grade}-${classNum}_${today}.zip`)
   }, [results, grade, classNum])
 
   const onDrop = useCallback((e: React.DragEvent) => {
@@ -280,7 +278,7 @@ export default function PhotoTool() {
           {results.map((entry, i) => (
             <div key={i} className="photo-cell" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: 0, overflow: 'hidden' }}>
               <div style={{ flex: 1, minHeight: 0, width: '100%', overflow: 'hidden' }}>
-                <img src={entry.id.url} alt={entry.name} style={{
+                <img src={entry.url} alt={entry.name} style={{
                   width: '100%', height: '100%', objectFit: 'contain',
                   borderRadius: 2, border: '1px solid #e5e7eb',
                 }} />
@@ -323,17 +321,14 @@ export default function PhotoTool() {
       <div style={{ background: '#fff', borderRadius: 12, padding: 20, marginBottom: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
           <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 600, background: '#dbeafe', color: '#2563eb' }}>
-            나이스: 600x800px JPEG 92%
-          </span>
-          <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 600, background: '#dcfce7', color: '#16a34a' }}>
-            학생증: 1240x1653px JPEG 92%
+            1240x1653px JPEG 92%
           </span>
           <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 600, background: '#fef3c7', color: '#d97706' }}>
             200KB 이하 자동 조절
           </span>
         </div>
         <p style={{ fontSize: '0.78rem', color: '#999' }}>
-          나이스 → <b>이름(번호).jpg</b> | 학생증 → <b>학년-반-번호 이름.jpg</b>
+          다운로드 파일명 — 나이스: <b>이름(번호).jpg</b> | 학생증: <b>학년-반-번호 이름.jpg</b>
         </p>
       </div>
 
@@ -388,9 +383,13 @@ export default function PhotoTool() {
       {/* 액션 버튼 */}
       {results.length > 0 && (
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 16 }}>
-          <button onClick={downloadZip}
+          <button onClick={() => downloadZip('neis')}
+            style={{ padding: '10px 20px', border: 'none', borderRadius: 8, fontSize: '0.9rem', fontWeight: 600, cursor: 'pointer', background: '#3b82f6', color: '#fff' }}>
+            나이스용 ZIP
+          </button>
+          <button onClick={() => downloadZip('id')}
             style={{ padding: '10px 20px', border: 'none', borderRadius: 8, fontSize: '0.9rem', fontWeight: 600, cursor: 'pointer', background: '#10b981', color: '#fff' }}>
-            나이스 + 학생증 ZIP 다운로드
+            학생증용 ZIP
           </button>
           <button onClick={handlePrint}
             style={{ padding: '10px 20px', border: 'none', borderRadius: 8, fontSize: '0.9rem', fontWeight: 600, cursor: 'pointer', background: '#1E2A1E', color: '#F6F7F2' }}>
@@ -407,7 +406,7 @@ export default function PhotoTool() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 10 }}>
         {results.map((entry, i) => (
           <div key={i} style={{ background: '#fff', borderRadius: 10, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingBottom: 8 }}>
-            <img src={entry.id.url} alt={entry.name} style={{ width: '100%', aspectRatio: '3/4', objectFit: 'cover', background: '#eee' }} />
+            <img src={entry.url} alt={entry.name} style={{ width: '100%', aspectRatio: '3/4', objectFit: 'cover', background: '#eee' }} />
             <div style={{ fontWeight: 600, fontSize: '0.78rem', marginTop: 4, textAlign: 'center', padding: '0 4px' }}>
               {entry.num}. {entry.name}
             </div>
@@ -416,16 +415,9 @@ export default function PhotoTool() {
               : <div style={{ fontSize: '0.7rem', color: '#ef4444' }}>매칭 안됨</div>
             }
             <div style={{ fontSize: '0.7rem', color: '#888', marginTop: 2, textAlign: 'center', padding: '0 4px' }}>
-              원본: {entry.origW}x{entry.origH} {fmt(entry.origSize)}
-            </div>
-            <div style={{ fontSize: '0.7rem', textAlign: 'center', padding: '0 4px' }}>
-              나이스{' '}
-              <span style={{ color: entry.neis.blob.size > MAX_SIZE ? '#ef4444' : '#888', fontWeight: entry.neis.blob.size > MAX_SIZE ? 700 : 400 }}>
-                {fmt(entry.neis.blob.size)}
-              </span>
-              {' · '}학생증{' '}
-              <span style={{ color: entry.id.blob.size > MAX_SIZE ? '#ef4444' : '#888', fontWeight: entry.id.blob.size > MAX_SIZE ? 700 : 400 }}>
-                {fmt(entry.id.blob.size)}
+              {fmt(entry.origSize)} →{' '}
+              <span style={{ color: entry.blob.size > MAX_SIZE ? '#ef4444' : '#888', fontWeight: entry.blob.size > MAX_SIZE ? 700 : 400 }}>
+                {fmt(entry.blob.size)}
               </span>
             </div>
           </div>
