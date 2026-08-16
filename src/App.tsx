@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import ClassTimetable from './components/ClassTimetable'
 import Schedule from './components/Schedule'
 import RoleAssign from './components/RoleAssign'
@@ -6,16 +6,18 @@ import TeacherTimetable from './components/TeacherTimetable'
 import StudentList from './components/StudentList'
 import Seating from './components/Seating'
 import FriendBingo from './components/FriendBingo'
-import Settings from './components/Settings'
 import TimetableSchedule from './components/TimetableSchedule'
 import PrintButton from './components/PrintButton'
 import AssignmentTool from './components/AssignmentTool'
 import PhotoTool from './components/PhotoTool'
 import StarCatcher from './components/StarCatcher'
-import { hashPassword } from './utils/crypto'
-import { getSemester, type SemesterId } from './data/semester'
+import SheetSetup from './components/SheetSetup'
+import SheetStatus from './components/SheetStatus'
+import { parseSemester, type SemesterId } from './data/semester'
+import { useSheet } from './sheet/client'
 import { useSemester } from './store'
-type TabId = 'students' | 'timetable' | 'teacher' | 'schedule' | 'combo' | 'role' | 'seating' | 'bingo' | 'assignment' | 'photo' | 'game' | 'settings'
+
+type TabId = 'students' | 'timetable' | 'teacher' | 'schedule' | 'combo' | 'role' | 'seating' | 'bingo' | 'assignment' | 'photo' | 'game'
 
 interface NavGroup {
   icon: string
@@ -53,10 +55,9 @@ const pages: Record<TabId, React.FC> = {
   assignment: AssignmentTool,
   photo: PhotoTool,
   game: StarCatcher,
-  settings: Settings,
 }
 
-const noPrintButton = new Set<TabId>(['role', 'seating', 'bingo', 'assignment', 'photo', 'game', 'settings'])
+const noPrintButton = new Set<TabId>(['role', 'seating', 'bingo', 'assignment', 'photo', 'game'])
 
 const printTitles: Partial<Record<TabId, string>> = {
   students: '우리반_학생',
@@ -72,7 +73,8 @@ const semesterScopedTabs = new Set<TabId>(['timetable', 'teacher', 'combo'])
 function printTitle(tab: TabId, semester: SemesterId): string | undefined {
   const base = printTitles[tab]
   if (!base) return undefined
-  return semesterScopedTabs.has(tab) ? `${getSemester(semester).label.replace(/\s+/g, '_')}_${base}` : base
+  if (!semesterScopedTabs.has(tab) || !semester) return base
+  return `${parseSemester(semester).label.replace(/\s+/g, '_')}_${base}`
 }
 
 const ZOOM_STEP = 0.1
@@ -113,36 +115,9 @@ export default function App() {
 
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [zoom, setZoom] = useState(loadZoom)
-  const [settingsAuthed, setSettingsAuthed] = useState(false)
-  const [settingsPw, setSettingsPw] = useState('')
-  const [settingsErr, setSettingsErr] = useState('')
-  const tapCount = useRef(0)
-  const tapTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const sheet = useSheet()
   const semester = useSemester()
   const Page = pages[tab]
-
-  const handleVersionTap = () => {
-    tapCount.current++
-    clearTimeout(tapTimer.current)
-    if (tapCount.current >= 5) {
-      tapCount.current = 0
-      setTab('settings')
-      setDrawerOpen(false)
-    } else {
-      tapTimer.current = setTimeout(() => { tapCount.current = 0 }, 1500)
-    }
-  }
-
-  const handleSettingsLogin = useCallback(async () => {
-    setSettingsErr('')
-    const hash = await hashPassword(settingsPw)
-    if (hash === __PASSWORD_HASH__) {
-      setSettingsAuthed(true)
-      setSettingsPw('')
-    } else {
-      setSettingsErr('비밀번호가 틀렸습니다')
-    }
-  }, [settingsPw])
 
   const selectTab = (id: TabId) => {
     setTab(id)
@@ -155,6 +130,17 @@ export default function App() {
       localStorage.setItem(ZOOM_KEY, String(next))
       return next
     })
+  }
+
+  // 시트가 연결되지 않았거나 아직 한 번도 못 읽었으면 설정 화면
+  if (!sheet.url || !sheet.config) {
+    return (
+      <main className="min-h-screen overflow-auto p-6">
+        {sheet.url && sheet.loading
+          ? <p className="text-center py-20 text-sm text-ink/40">시트를 불러오는 중...</p>
+          : <SheetSetup />}
+      </main>
+    )
   }
 
   return (
@@ -255,54 +241,19 @@ export default function App() {
           })}
         </div>
 
-        {/* 하단 */}
-        <div className="px-6 py-4 shrink-0 text-center" style={{ borderTop: '1px solid rgba(246,247,242,0.08)' }}>
-          <span onClick={handleVersionTap}
-            className="text-[10px] text-bg/20 cursor-default select-none">
-            {__BUILD_VERSION__}
-          </span>
+        {/* 하단: 시트 상태 */}
+        <div className="px-5 py-4 shrink-0" style={{ borderTop: '1px solid rgba(246,247,242,0.08)' }}>
+          <SheetStatus />
+          <p className="text-[10px] text-bg/15 text-center mt-3 select-none">{__BUILD_VERSION__}</p>
         </div>
       </nav>
 
       {/* 메인 콘텐츠 */}
       <main className="print-reset flex-1 flex justify-center items-start overflow-auto p-8 pt-16">
-        {tab === 'settings' && !settingsAuthed ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="rounded-2xl p-8 w-80" style={{ background: '#fff', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
-              <h2 className="text-lg font-bold mb-1" style={{ color: '#1E2A1E' }}>설정</h2>
-              <p className="text-sm mb-4" style={{ color: '#1E2A1E', opacity: 0.5 }}>비밀번호를 입력하세요</p>
-              <form onSubmit={e => { e.preventDefault(); handleSettingsLogin().catch(() => setSettingsErr('인증 오류')) }}>
-                <input
-                  type="password"
-                  value={settingsPw}
-                  onChange={e => { setSettingsPw(e.target.value); setSettingsErr('') }}
-                  className="w-full px-3 py-2 rounded-lg text-sm mb-2"
-                  style={{ border: '1px solid #ddd', outline: 'none' }}
-                  placeholder="비밀번호"
-                  autoFocus
-                />
-                {settingsErr && <p className="text-xs mb-2" style={{ color: '#e74c3c' }}>{settingsErr}</p>}
-                <div className="flex gap-2">
-                  <button type="submit"
-                    className="flex-1 py-2 rounded-lg font-bold text-sm border-none cursor-pointer"
-                    style={{ background: '#1E2A1E', color: '#F6F7F2' }}>
-                    확인
-                  </button>
-                  <button type="button" onClick={() => { setTab('timetable'); setSettingsPw(''); setSettingsErr('') }}
-                    className="px-4 py-2 rounded-lg text-sm border-none cursor-pointer"
-                    style={{ background: '#eee', color: '#666' }}>
-                    취소
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        ) : (
-          <div className="print-reset origin-top" style={{ zoom }}>
-            {!noPrintButton.has(tab) && <PrintButton title={printTitle(tab, semester)} />}
-            <Page />
-          </div>
-        )}
+        <div className="print-reset origin-top" style={{ zoom }}>
+          {!noPrintButton.has(tab) && <PrintButton title={printTitle(tab, semester)} />}
+          <Page />
+        </div>
       </main>
     </div>
     </>

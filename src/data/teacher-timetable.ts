@@ -1,22 +1,4 @@
-import type { SemesterId } from './semester'
-
 export const days = ['월', '화', '수', '목', '금']
-
-// null = 공강
-// null = 해당 학기 시간표 미등록
-export const grids: Record<SemesterId, (string | null)[][] | null> = {
-  '2026-1': [
-    ['1-3',  null,  '1-7', '1-8', '1-2'],
-    ['1-8',  '1-7', null,  '1-5', null ],
-    [null,   '1-4', '1-4', null,  '1-5'],
-    ['1-6',  null,  '1-1', null,  '1-1'],
-    [null,   '1-9', null,  '1-6', null ],
-    ['1-9',  null,  '1-2', null,  '1-3'],
-    [null,   null,  null,  null,  null ],
-  ],
-  // 2학기 반별 배정표가 나오면 위와 같은 형태로 채우기
-  '2026-2': null,
-}
 
 // 반별 색상
 const CLASS_COLORS: Record<string, { bg: string; bar: string; fg: string }> = {

@@ -1,9 +1,8 @@
-import { defineConfig, loadEnv } from 'vite'
+import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import { execSync } from 'node:child_process'
-import { pbkdf2Sync } from 'node:crypto'
 
 function getBuildVersion(): string {
   try {
@@ -16,15 +15,8 @@ function getBuildVersion(): string {
   }
 }
 
-function makePasswordHash(password: string): string {
-  const salt = Buffer.from('homeroomkit-password-hash-salt')
-  return pbkdf2Sync(password, salt, 100_000, 32, 'sha256').toString('hex')
-}
 
-export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), '')
-  const password = env.VITE_ENCRYPTION_PASSWORD ?? ''
-
+export default defineConfig(() => {
   return {
     plugins: [
       react(),
@@ -53,7 +45,6 @@ export default defineConfig(({ mode }) => {
     base: '/homeroomkit/',
     define: {
       __BUILD_VERSION__: JSON.stringify(getBuildVersion()),
-      __PASSWORD_HASH__: JSON.stringify(password ? makePasswordHash(password) : ''),
     },
   }
 })

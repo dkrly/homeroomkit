@@ -1,7 +1,8 @@
-import { scheduleRows } from '../data/schedule'
+import { useAppData } from '../store'
 import PageHeader from './PageHeader'
 
 export function ScheduleContent() {
+  const { scheduleRows } = useAppData()
   return (
     <div className="flex-1 flex flex-col gap-[3px]">
       {scheduleRows.map((row) => (
