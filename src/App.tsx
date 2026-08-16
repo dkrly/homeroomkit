@@ -133,10 +133,10 @@ export default function App() {
   }
 
   // 시트가 연결되지 않았거나 아직 한 번도 못 읽었으면 설정 화면
-  if (!sheet.url || !sheet.config) {
+  if (!sheet.source || !sheet.config) {
     return (
       <main className="min-h-screen overflow-auto p-6">
-        {sheet.url && sheet.loading
+        {sheet.source && sheet.loading
           ? <p className="text-center py-20 text-sm text-ink/40">시트를 불러오는 중...</p>
           : <SheetSetup />}
       </main>

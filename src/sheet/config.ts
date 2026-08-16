@@ -6,6 +6,9 @@ import { sortSemesters, type SemesterId } from '../data/semester'
 export type RawTabs = Record<string, string[][]>
 export type Grid = (string | null)[][]
 
+/** 앱이 읽는 탭 이름. Apps Script 의 TABS 와 같아야 한다 */
+export const TAB_NAMES = ['학급', '학생', '역할', '거리두기', '친구탐험', '반시간표', '정보시간표', '일과표']
+
 export interface SheetConfig {
   grade?: number
   classNum?: number
