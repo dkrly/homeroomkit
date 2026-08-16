@@ -13,6 +13,8 @@ import AssignmentTool from './components/AssignmentTool'
 import PhotoTool from './components/PhotoTool'
 import StarCatcher from './components/StarCatcher'
 import { hashPassword } from './utils/crypto'
+import { getSemester, type SemesterId } from './data/semester'
+import { useSemester } from './store'
 type TabId = 'students' | 'timetable' | 'teacher' | 'schedule' | 'combo' | 'role' | 'seating' | 'bingo' | 'assignment' | 'photo' | 'game' | 'settings'
 
 interface NavGroup {
@@ -64,6 +66,15 @@ const printTitles: Partial<Record<TabId, string>> = {
   combo: '시간표_일과운영표',
 }
 
+// 인쇄 파일명에 학기를 붙이는 탭
+const semesterScopedTabs = new Set<TabId>(['timetable', 'teacher', 'combo'])
+
+function printTitle(tab: TabId, semester: SemesterId): string | undefined {
+  const base = printTitles[tab]
+  if (!base) return undefined
+  return semesterScopedTabs.has(tab) ? `${getSemester(semester).label.replace(/\s+/g, '_')}_${base}` : base
+}
+
 const ZOOM_STEP = 0.1
 const ZOOM_MIN = 0.5
 const ZOOM_MAX = 1.5
@@ -107,6 +118,7 @@ export default function App() {
   const [settingsErr, setSettingsErr] = useState('')
   const tapCount = useRef(0)
   const tapTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const semester = useSemester()
   const Page = pages[tab]
 
   const handleVersionTap = () => {
@@ -287,7 +299,7 @@ export default function App() {
           </div>
         ) : (
           <div className="print-reset origin-top" style={{ zoom }}>
-            {!noPrintButton.has(tab) && <PrintButton title={printTitles[tab]} />}
+            {!noPrintButton.has(tab) && <PrintButton title={printTitle(tab, semester)} />}
             <Page />
           </div>
         )}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { defaultFixedRoles, defaultVariableRoles, defaultSeating, defaultBingoQuestions } from './data/defaults'
+import { DEFAULT_SEMESTER, isSemesterId, type SemesterId } from './data/semester'
 
 const STORAGE_KEY = 'homeroomkit'
 
@@ -57,6 +58,7 @@ export interface AppData {
   roleResult?: RoleResult | null
   grade?: number
   classNum?: number
+  semester?: SemesterId
 }
 
 const defaultData: AppData = {
@@ -66,6 +68,7 @@ const defaultData: AppData = {
   roleSelectedNums: [],
   seating: defaultSeating,
   bingoQuestions: defaultBingoQuestions,
+  semester: DEFAULT_SEMESTER,
 }
 
 function migrate(data: Record<string, unknown>): Record<string, unknown> {
@@ -128,4 +131,13 @@ export function useAppData(): AppData {
     return () => { listeners.delete(fn) }
   }, [])
   return current
+}
+
+export function useSemester(): SemesterId {
+  const { semester } = useAppData()
+  return isSemesterId(semester) ? semester : DEFAULT_SEMESTER
+}
+
+export function setSemester(semester: SemesterId) {
+  setData({ semester })
 }
