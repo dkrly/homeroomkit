@@ -1,3 +1,5 @@
+import type { SemesterId } from './semester'
+
 // 과목별 색상
 export const subjectColors: Record<string, { bg: string; bar: string; fg: string }> = {
   국어: { bg: '#FCF0E8', bar: '#C47A52', fg: '#8B4725' },
@@ -26,6 +28,29 @@ export const subjectColors: Record<string, { bg: string; bar: string; fg: string
 }
 
 export const days = ['월', '화', '수', '목', '금']
+
+// null = 빈 칸
+export const grids: Record<SemesterId, (string | null)[][]> = {
+  '2026-1': [
+    ['체육', '진탐', '영어', '과학', '정보'],
+    ['국어', '국어', '음악', '국어', '과학'],
+    ['사회', '체육', '도덕A', '가정', '수학'],
+    ['영어', '창특', '수학', '도덕A', '영어'],
+    ['미술', '스포츠', '사회', '진로', '도덕B'],
+    ['수학', '주선', '정보', '주선', '체육'],
+    [null, '주선', null, '주선', null],
+  ],
+  // 목 3~4교시 가정은 연속 2시간 블록
+  '2026-2': [
+    ['국어', '과학B', '과학A', '체육', '수학'],
+    ['영어', '협종', '독서', '과학A', '영어'],
+    ['인공지능', '사회', '도덕A', '가정', '진로와직'],
+    ['사회', '국어', '인공지능', '가정', '체육'],
+    ['도덕A', '스포츠', '음악', '수학', '국어'],
+    ['수학', '미술', '체육', '도덕B', '사회'],
+    [null, '수학', null, '영어', null],
+  ],
+}
 
 const DEFAULT_COLOR = { bg: '#EFF1E8', bar: '#B0B8A0', fg: '#4A4A4A' }
 

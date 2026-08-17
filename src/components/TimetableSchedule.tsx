@@ -1,5 +1,5 @@
-import { days, getSubjectColor } from '../data/timetable'
-import { useAppData } from '../store'
+import { days, grids, getSubjectColor } from '../data/timetable'
+import { useSemester } from '../store'
 import { TimetableContent } from './Timetable'
 import { ScheduleContent } from './Schedule'
 import PageHeader from './PageHeader'
@@ -9,14 +9,14 @@ import SemesterToggle from './SemesterToggle'
 const PANEL_ZOOM = 1.41
 
 export default function TimetableSchedule() {
-  const { classGrids, semester } = useAppData()
+  const semester = useSemester()
   return (
     <div className="page-a2">
       <div className="flex flex-1 min-h-0">
         {/* 왼쪽: 시간표 */}
         <div className="flex-1 flex flex-col min-w-0" style={{ zoom: PANEL_ZOOM }}>
           <PageHeader badge="Class" title="우리반 시간표" extra={<SemesterToggle />} />
-          <TimetableContent days={days} grid={classGrids[semester] ?? null} getColor={getSubjectColor} />
+          <TimetableContent days={days} grid={grids[semester]} getColor={getSubjectColor} />
         </div>
 
         {/* 세로 구분선 */}

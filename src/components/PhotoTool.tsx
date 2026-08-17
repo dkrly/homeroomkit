@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
-import { useAppData } from '../store'
+import { useAppData, setData } from '../store'
 import PageHeader from './PageHeader'
 import * as faceapi from 'face-api.js'
 import JSZip from 'jszip'
@@ -141,10 +141,10 @@ export default function PhotoTool() {
     loadFaceModel().then(() => setFaceReady(faceModelLoaded))
   }, [])
 
-  // 학년/반 기본값은 시트의 학급 탭에서 온다. 여기서는 파일명용으로만 임시 변경
   const saveClassInfo = useCallback((g: number, c: number) => {
     setGrade(g)
     setClassNum(c)
+    setData({ grade: g, classNum: c })
   }, [])
 
   const handleFiles = useCallback(async (fileList: FileList) => {
